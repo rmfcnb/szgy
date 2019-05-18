@@ -47,7 +47,7 @@ public class CompetitionManager {
         return new ResponseEntity<>(comp, HttpStatus.OK);
     }
 
-    @GetMapping("/bname/{name}")
+    @GetMapping("/byname/{name}")
     public ResponseEntity<Competition> getCompetitionByName(@PathVariable("name") String name){
         return getCompetition(compRepo.findByName(name).getId());
     }
