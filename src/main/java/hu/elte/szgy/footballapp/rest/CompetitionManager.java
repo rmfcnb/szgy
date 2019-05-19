@@ -8,7 +8,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.servlet.ModelAndView;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -39,6 +41,13 @@ public class CompetitionManager {
             }
         }
         return new ResponseEntity<>(compList, HttpStatus.OK);
+    }
+
+    @GetMapping("/allcomp")
+    public ModelAndView getAllCompetitionsPage(){
+        ModelAndView mv = new ModelAndView("competitions");
+        mv.addObject("Competition", getAllCompetition("").toString());
+        return mv;
     }
 
     @GetMapping("/{id}")

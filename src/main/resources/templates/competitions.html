@@ -9,17 +9,23 @@
     <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/extjs/6.2.0/classic/theme-neptune/theme-neptune.js"></script>
     <script type="text/javascript">
         Ext.onReady(function(){
+            Ext.define('model.Competition', {
+                extend: 'Ext.data.Model',
+                fields: ['id', 'name']
+            });
 
             Ext.define('store.Competition', {
-               extend: 'Ext.data.Store',
-               model: 'model.Competition',
-               proxy: {
-                   type: 'ajax',
-                   url: 'competitions/all'
-               }
+                extend: 'Ext.data.Store',
+                model: 'model.Competition',
+                proxy: {
+                    type: 'ajax',
+                    url: 'competition/all'
+                }
             });
 
             var competitions = Ext.create('store.Competition');
+
+            console.log(competitions);
 
             Ext.create('Ext.grid.Panel', {
                 renderTo: Ext.getBody(),
