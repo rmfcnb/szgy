@@ -2,11 +2,9 @@ package hu.elte.szgy.footballapp.rest;
 
 import hu.elte.szgy.footballapp.data.*;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.transaction.annotation.Transactional;
-import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.ModelAndView;
 
@@ -32,30 +30,23 @@ public class CompetitionManager {
     private MatchRepository matchRepo;
 
     @GetMapping("/all")
-    public ResponseEntity<List<Competition>> getAllCompetition(@RequestParam(name = "type", required = false) String type){
+    public ResponseEntity<List<Competition>> getAllCompetition(@RequestParam(name = "type", required = false) String type) {
         List<Competition> compList = new LinkedList<>();
-        /*if (type != null) {
-            List<Competition> fullList = compList;
-            compList = new ArrayList<>();
-            for (Competition e : fullList) {
-                if (e.getType().equals(type)) {
-                    compList.add(e);
-                }
-            }*/
-
             if(type == null){
                 compList = compRepo.findAll();
             }
-
-            if(type.equals("LEAGUE") || type == null){
+            else if(type.equals("LEAGUE")){
                 for(League league : leagueRepo.findAll()){
                     compList.add(league);
                 }
             }
-            if(type.equals("CUP") || type == null){
+            else if(type == null || type.equals("CUP")){
                 for(Cup cup : cupRepo.findAll()){
                     compList.add(cup);
                 }
+            }
+            else{
+                return new ResponseEntity<>(HttpStatus.NOT_FOUND);
             }
         //}
         return new ResponseEntity<>(compList, HttpStatus.OK);
@@ -66,6 +57,13 @@ public class CompetitionManager {
         ModelAndView mv = new ModelAndView("competitions");
         mv.addObject("Competition", getAllCompetition("").toString());
         return mv;
+    }
+
+    @GetMapping("/{id}/teams")
+    public ResponseEntity<LinkedList<Team>> getAllTeamsByCompetition (@PathVariable("id") int id){
+        Optional<Competition> comp = compRepo.findById(id);
+        return comp.map(competition -> new ResponseEntity<>(new LinkedList<>(competition.getTeams()), HttpStatus.OK)).orElseGet(() -> new ResponseEntity<>(HttpStatus.NOT_FOUND));
+
     }
 
     @GetMapping("/{id}")
@@ -92,7 +90,6 @@ public class CompetitionManager {
                 team.setName("Team " + i);
                 teams.add(team);
             }
-            //teamRepo.saveAll(teams);
 
             for(int i=0; i<10; i++){
                 comps.add(new League(i, "League "+i));
@@ -108,15 +105,9 @@ public class CompetitionManager {
 
             }
             if(!comps.stream().anyMatch(league -> leagueRepo.findById(league.getCompId()).isPresent())){
-                /*compRepo.saveAll(comps);
-                compRepo.flush();*/
                 for(League l : comps){
                     leagueRepo.saveAndFlush(l);
                 }
-                //leagueRepo.saveAll(comps);
-                //leagueRepo.flush();
-                List<Competition> c = compRepo.findAll();
-                List<League> l = leagueRepo.findAll();
             }
         }
         catch (Exception e){
