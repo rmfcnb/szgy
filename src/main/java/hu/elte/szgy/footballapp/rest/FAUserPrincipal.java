@@ -4,7 +4,7 @@ import hu.elte.szgy.footballapp.data.User;
 
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
-import sun.reflect.generics.reflectiveObjects.NotImplementedException;
+/*import sun.reflect.generics.reflectiveObjects.NotImplementedException;*/
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -18,7 +18,7 @@ public class FAUserPrincipal implements UserDetails {
     public FAUserPrincipal(User user){
         this.user = user;
 
-        throw new NotImplementedException();
+        throw new UnsupportedOperationException();
     }
 
     @Override

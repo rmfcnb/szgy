@@ -31,6 +31,7 @@ public class FAWebSecurity extends WebSecurityConfigurerAdapter {
                     .antMatchers("/competition/all").permitAll()
                     .antMatchers("/competitions").permitAll()
                     .antMatchers("/competition/allcomp").permitAll()
+                    .antMatchers("/competition/generateCompetitions").permitAll()
                     .antMatchers(HttpMethod.GET, "/","/extjs/**").permitAll()
                     .and()
                 .csrf().disable()

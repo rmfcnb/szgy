@@ -32,6 +32,6 @@ public class TeamManager {
 
     @GetMapping("/bname/{name}")
     public ResponseEntity<Team> getTeamByName(@PathVariable("name") String name){
-        return getTeam(teamRepo.findByName(name).getId());
+        return getTeam(teamRepo.findByName(name).getTeamId());
     }
 }
