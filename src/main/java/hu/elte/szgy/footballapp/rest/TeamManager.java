@@ -7,7 +7,9 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.Comparator;
 import java.util.List;
+import java.util.Optional;
 
 @RestController
 @RequestMapping("team")
@@ -33,5 +35,17 @@ public class TeamManager {
     @GetMapping("/bname/{name}")
     public ResponseEntity<Team> getTeamByName(@PathVariable("name") String name){
         return getTeam(teamRepo.findByName(name).getTeamId());
+    }
+
+    @PostMapping("/new")
+    public ResponseEntity<Team> createTeam(@RequestBody Team team){
+        team.setTeamId(getNewId());
+        teamRepo.saveAndFlush(team);
+        return new ResponseEntity<>(team, HttpStatus.OK);
+    }
+
+    private int getNewId(){
+        Optional<Team> maxIdTeam = teamRepo.findAll().stream().max(Comparator.comparingInt(Team::getTeamId));
+        return maxIdTeam.map(team -> team.getTeamId() + 1).orElse(0);
     }
 }
