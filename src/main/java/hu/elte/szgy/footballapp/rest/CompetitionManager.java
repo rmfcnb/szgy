@@ -105,9 +105,7 @@ public class CompetitionManager {
 
             }
             if(!comps.stream().anyMatch(league -> leagueRepo.findById(league.getCompId()).isPresent())){
-                for(League l : comps){
-                    leagueRepo.saveAndFlush(l);
-                }
+                leagueRepo.saveAll(comps);
             }
         }
         catch (Exception e){

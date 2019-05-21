@@ -1,5 +1,6 @@
 package hu.elte.szgy.footballapp.rest;
 
+import com.fasterxml.jackson.annotation.JsonCreator;
 import hu.elte.szgy.footballapp.data.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -38,12 +39,13 @@ public class TeamManager {
     }
 
     @PostMapping("/new")
-    public ResponseEntity<Team> createTeam(@RequestBody Team team){
-        team.setTeamId(getNewId());
-        teamRepo.saveAndFlush(team);
-        return new ResponseEntity<>(team, HttpStatus.OK);
+    public ResponseEntity<Team> createTeam(@RequestBody TeamDTO team){
+        Team newTeam = new Team();
+        newTeam.setTeamId(getNewId());
+        newTeam.setName(team.getName());
+        teamRepo.saveAndFlush(newTeam);
+        return new ResponseEntity<>(newTeam, HttpStatus.OK);
     }
-
     private int getNewId(){
         Optional<Team> maxIdTeam = teamRepo.findAll().stream().max(Comparator.comparingInt(Team::getTeamId));
         return maxIdTeam.map(team -> team.getTeamId() + 1).orElse(0);

@@ -17,7 +17,6 @@
                 width: 350,
                 height: 350,
                 autoHeight: true,
-                url: '/team/new',
                 layout: {
                     type: 'vbox',
                     align: 'stretch'
@@ -31,7 +30,10 @@
                     text: "Create",
                     handler: function() {
                         var form = this.up('form').getForm();
-                        form.submit({
+                        Ext.Ajax.request({
+                            url: '/team/new',
+                            method: 'POST',
+                            jsonData: form.getValues(),
                             success: function (form, action) {
                                 Ext.Msg.alert('Success', action.result.msg);
                             },
