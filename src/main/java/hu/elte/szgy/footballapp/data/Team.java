@@ -26,6 +26,7 @@ public class Team implements Serializable {
     @Column(name = "ID")
     private int teamId;
 
+    @Column(unique = true)
     private String name;
 
     @ManyToMany(mappedBy = "teams", cascade = CascadeType.ALL)

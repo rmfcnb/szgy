@@ -24,6 +24,7 @@ public class Competition implements Serializable {
     @Column(name = "ID")
     private int compId;
 
+    @Column(unique = true)
     private String name;
 
     @OneToMany(fetch = FetchType.LAZY, mappedBy = "competition")

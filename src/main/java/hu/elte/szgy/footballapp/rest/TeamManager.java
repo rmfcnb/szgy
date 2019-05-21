@@ -35,7 +35,12 @@ public class TeamManager {
 
     @GetMapping("/bname/{name}")
     public ResponseEntity<Team> getTeamByName(@PathVariable("name") String name){
-        return getTeam(teamRepo.findByName(name).getTeamId());
+        Optional<Team> team = teamRepo.findByName(name);
+
+        if(!team.isPresent()){
+            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+        }
+        return getTeam(team.get().getTeamId());
     }
 
     @PostMapping("/new")
@@ -46,6 +51,7 @@ public class TeamManager {
         teamRepo.saveAndFlush(newTeam);
         return new ResponseEntity<>(newTeam, HttpStatus.OK);
     }
+
     private int getNewId(){
         Optional<Team> maxIdTeam = teamRepo.findAll().stream().max(Comparator.comparingInt(Team::getTeamId));
         return maxIdTeam.map(team -> team.getTeamId() + 1).orElse(0);

@@ -36,14 +36,10 @@ public class CompetitionManager {
                 compList = compRepo.findAll();
             }
             else if(type.equals("LEAGUE")){
-                for(League league : leagueRepo.findAll()){
-                    compList.add(league);
-                }
+                compList.addAll(leagueRepo.findAll());
             }
-            else if(type == null || type.equals("CUP")){
-                for(Cup cup : cupRepo.findAll()){
-                    compList.add(cup);
-                }
+            else if(type.equals("CUP")){
+                compList.addAll(cupRepo.findAll());
             }
             else{
                 return new ResponseEntity<>(HttpStatus.NOT_FOUND);
@@ -77,6 +73,35 @@ public class CompetitionManager {
         return getCompetition(compRepo.findByName(name).getCompId());
     }
 
+    @PostMapping("/new")
+    public ResponseEntity<String> createCompetition(@RequestBody NewCompetitionDTO comp){
+        Set<Team> teams = new HashSet<>();
+
+        if(comp.getCompetitionName().equals("")){
+            return new ResponseEntity<>("Competition must have a name!", HttpStatus.BAD_REQUEST);
+        }
+
+        for(String name : comp.getTeamNames()){
+            Optional<Team> team = teamRepo.findByName(name);
+            if(!team.isPresent()){
+                return new ResponseEntity<>("The following team does not exist yet: "+team.get(), HttpStatus.BAD_REQUEST);
+            }
+            if(teams.contains(team.get())){
+                return new ResponseEntity<>("The following team is already in the competition: "+team.get(), HttpStatus.BAD_REQUEST);
+            }
+            teams.add(team.get());
+        }
+
+        Competition newComp = new Competition();
+        newComp.setCompId(getNewId());
+        newComp.setName(comp.getCompetitionName());
+        newComp.setTeams(teams);
+
+        compRepo.save(newComp);
+
+        return new ResponseEntity<>(HttpStatus.OK);
+    }
+
     @GetMapping("/generateCompetitions")
     public ResponseEntity<Void> getGenerateCompetitions(){
 
@@ -104,7 +129,7 @@ public class CompetitionManager {
                 comps.get(i).setTeams(compTeams);
 
             }
-            if(!comps.stream().anyMatch(league -> leagueRepo.findById(league.getCompId()).isPresent())){
+            if(comps.stream().noneMatch(league -> leagueRepo.findById(league.getCompId()).isPresent())){
                 leagueRepo.saveAll(comps);
             }
         }
@@ -113,5 +138,10 @@ public class CompetitionManager {
         }
 
         return new ResponseEntity<>(HttpStatus.OK);
+    }
+
+    private int getNewId(){
+        Optional<Competition> maxIdComp = compRepo.findAll().stream().max(Comparator.comparingInt(Competition::getCompId));
+        return maxIdComp.map(team -> team.getCompId() + 1).orElse(0);
     }
 }

@@ -1,0 +1,149 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:th="http://www.thymeleaf.org"
+      xmlns:sec="http://www.thymeleaf.org/thymeleaf-extras-springsecurity3">
+<head>
+    <meta charset="UTF-8">
+    <title>New Competition</title>
+    <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/extjs/6.2.0/ext-all-debug.js"></script>
+    <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/extjs/6.2.0/classic/theme-neptune/theme-neptune.js"></script>
+    <script type="text/javascript">
+        Ext.onReady(function(){
+            var store = Ext.create('Ext.data.Store', {
+			fields : ['teamName'],
+			data   : {
+				items : [
+					{ teamName : '-' },
+					{ teamName : '-' },
+					{ teamName : '-' },
+					{ teamName : '-' }
+				]
+			},
+                proxy  : {
+                    type   : 'memory',
+                    reader : {
+                        type : 'json',
+                        rootProperty : 'items'
+                    }
+                }
+            });
+
+            console.log(store.count());
+
+            Ext.define('MyApp.view.MyGridPanel', {
+                extend: 'Ext.grid.Panel',
+                alias: 'widget.mygridpanel',
+                height: 315,
+                width: 784,
+                title: 'Teams',
+                store: store,
+
+                columns: [  { editor : {
+                                xtype : 'textfield',
+                                allowBlank : false
+                            },
+                            dataIndex : 'teamName',
+                            flex : 1
+                }],
+                plugins: [{
+                    ptype: 'cellediting',
+                    autoCancel: false,
+                    clicksToEdit: 1
+                }]
+            });
+
+            var grid = Ext.create('MyApp.view.MyGridPanel', {
+                renderTo: Ext.getBody()
+            });
+
+            var addButton = Ext.create('Ext.Button', {
+                text: "Add team",
+                style: {
+                    border: 1
+                },
+                handler: function() {
+                    addRow()
+                }
+            });
+
+            var removeButton = Ext.create('Ext.Button', {
+                text: "Remove team",
+                style: {
+                    border: 1
+                },
+                handler: function() {
+                    removeRow()
+                }
+            });
+
+            var createButton = Ext.create('Ext.Button', {
+                text: "Create",
+                style: {
+                    border: 1
+                },
+                handler: function() {
+                    Ext.Ajax.request({
+                        url: '/competition/new',
+                        method: 'POST',
+                        jsonData: getCompetition(),
+                        success: function (form, action) {
+                            alert("Success");
+                        },
+                        failure: function (form, action) {
+                            alert(form.responseText);
+                        }
+                    })
+                }
+            });
+
+            var getCompetition = function(){
+                var teams = [];
+                for(var i=0; i<store.count(); i++){
+                    teams = teams.concat(store.getAt(i).data.teamName);
+                }
+                return {
+                    competitionName : nameField.getValue(),
+                    teamNames: teams
+                }
+            };
+
+            var nameField = new Ext.form.TextField({
+                text: '',
+                allowBlank: false
+            });
+
+            Ext.create('Ext.panel.Panel', {
+                renderTo: Ext.getBody(),
+                width: 1000,
+                height:500,
+                layout: 'border',
+                items: [
+                    nameField,
+                    addButton,
+                    removeButton,
+                    grid,
+                    { region:'east', width: 140},
+                    createButton
+                ]
+            }).center();
+
+            addRow = function() {
+                if(store.getCount() >= 16){
+                    return;
+                }
+                store.add({teamName : '-'});
+            };
+
+            removeRow = function() {
+                if(store.getCount() <= 2){
+                    return;
+                }
+                store.removeAt(store.getCount()-1);
+            };
+        });
+    </script>
+</head>
+<body>
+    <div id="maindiv" style="height: 1000px"/>
+</body>
+</html>
