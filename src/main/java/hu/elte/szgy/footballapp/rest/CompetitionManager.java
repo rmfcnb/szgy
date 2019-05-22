@@ -1,5 +1,7 @@
 package hu.elte.szgy.footballapp.rest;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import hu.elte.szgy.footballapp.data.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -111,6 +113,17 @@ public class CompetitionManager {
         }
 
         return new ResponseEntity<>(compDTO, HttpStatus.OK);
+    }
+
+    @GetMapping("/byId/{id}")
+    public ModelAndView f(@PathVariable("id") int cid){
+        ModelAndView mv = new ModelAndView("competition");
+        try {
+            mv.addObject("competitionId", (new ObjectMapper()).writeValueAsString(cid));
+        } catch (JsonProcessingException e) {
+            e.printStackTrace();
+        }
+        return mv;
     }
 
     @GetMapping("/generateCompetitions")
