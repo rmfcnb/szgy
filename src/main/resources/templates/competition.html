@@ -8,32 +8,9 @@
     <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/extjs/6.2.0/ext-all-debug.js"></script>
     <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/extjs/6.2.0/classic/theme-neptune/theme-neptune.js"></script>
     <script type="text/javascript">
-        var compId = "[[${competitionId}]]";
+        var competitionStr = "[[${competition}]]";
         Ext.onReady(function(){
-            //var cid = JSON.parse(compId);
-            //var compId = Ext.urlDecode(window.location.search.substring(0)).compId;
-            Ext.Ajax.request({
-                url: '/competition/' + compId,
-                method: 'GET',
-                dataType: 'json',
-                success: function (data, status) {
-                    var comp = Ext.util.JSON.decode(data.responseText);
-                    console.log(comp);
-                    init(comp);
-                    alert("Success");
-                },
-                failure: function (data, status) {
-                    console.log(data);
-                    switch(data.status){
-                        case 400:
-                        case 404:
-                            alert("Invalid Competition id: " + compId);
-                            break;
-                        default:
-                            alert(data.responseText);
-                    }
-                }
-            });
+            var competition = JSON.parse(competitionStr.replace(/&quot;/g,'"'));
 
             var compNameLabel = Ext.create('Ext.form.Label', {
                 text: ""
@@ -51,7 +28,9 @@
 
             var init = function (comp) {
                 compNameLabel.setText(comp.name);
-            }
+            };
+
+            init(competition);
         });
     </script>
 </head>

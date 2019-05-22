@@ -11,6 +11,7 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.ModelAndView;
 
 import java.util.*;
+import java.util.stream.Collectors;
 
 @RestController
 @RequestMapping("competition")
@@ -98,31 +99,29 @@ public class CompetitionManager {
         return new ResponseEntity<>(HttpStatus.OK);
     }
 
-    @GetMapping("/{id}")
-    public /*@ResponseBody CompetitionDTO*/ResponseEntity<CompetitionDTO> getCompetitionById(@PathVariable(value = "id", required = true) int compId){
+    // TODO: redirect to error page
+    @GetMapping("/byId/{id}")
+    public ModelAndView getCompetitionById(@PathVariable("id") int compId){
+        ModelAndView mv = new ModelAndView("competition");
         Optional<Competition> comp = compRepo.findById(compId);
 
-        CompetitionDTO compDTO = new CompetitionDTO();
-
         if(comp.isPresent()){
+            CompetitionDTO compDTO = new CompetitionDTO();
             compDTO.setName(comp.get().getName());
-            compDTO.setTeams(new LinkedList(comp.get().getTeams()));
-        }
-        else{
-            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+            List<TeamDTO> teams = comp.get().getTeams().stream().map(team -> {
+                TeamDTO teamDTO = new TeamDTO();
+                teamDTO.setName(team.getName());
+                return teamDTO;
+            }).collect(Collectors.toList());
+            compDTO.setTeams(teams);
+            try {
+                String json = (new ObjectMapper()).writeValueAsString(compDTO);
+                mv.addObject("competition", json);
+            } catch (JsonProcessingException e) {
+                e.printStackTrace();
+            }
         }
 
-        return new ResponseEntity<>(compDTO, HttpStatus.OK);
-    }
-
-    @GetMapping("/byId/{id}")
-    public ModelAndView f(@PathVariable("id") int cid){
-        ModelAndView mv = new ModelAndView("competition");
-        try {
-            mv.addObject("competitionId", (new ObjectMapper()).writeValueAsString(cid));
-        } catch (JsonProcessingException e) {
-            e.printStackTrace();
-        }
         return mv;
     }
 
