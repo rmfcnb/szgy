@@ -62,12 +62,6 @@ public class CompetitionManager {
 
     }
 
-    @GetMapping("/{id}")
-    public ResponseEntity<Competition> getCompetition(@PathVariable("id") Integer id){
-        Competition comp = compRepo.findById(id).get();
-        return new ResponseEntity<>(comp, HttpStatus.OK);
-    }
-
     @GetMapping("/byname/{name}")
     public ResponseEntity<Competition> getCompetitionByName(@PathVariable("name") String name){
         return getCompetition(compRepo.findByName(name).getCompId());
@@ -100,6 +94,23 @@ public class CompetitionManager {
         compRepo.save(newComp);
 
         return new ResponseEntity<>(HttpStatus.OK);
+    }
+
+    @GetMapping("/{id}")
+    public /*@ResponseBody CompetitionDTO*/ResponseEntity<CompetitionDTO> getCompetitionById(@PathVariable(value = "id", required = true) int compId){
+        Optional<Competition> comp = compRepo.findById(compId);
+
+        CompetitionDTO compDTO = new CompetitionDTO();
+
+        if(comp.isPresent()){
+            compDTO.setName(comp.get().getName());
+            compDTO.setTeams(new LinkedList(comp.get().getTeams()));
+        }
+        else{
+            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+        }
+
+        return new ResponseEntity<>(compDTO, HttpStatus.OK);
     }
 
     @GetMapping("/generateCompetitions")
@@ -138,6 +149,11 @@ public class CompetitionManager {
         }
 
         return new ResponseEntity<>(HttpStatus.OK);
+    }
+
+    private ResponseEntity<Competition> getCompetition(Integer id){
+        Competition comp = compRepo.findById(id).get();
+        return new ResponseEntity<>(comp, HttpStatus.OK);
     }
 
     private int getNewId(){
