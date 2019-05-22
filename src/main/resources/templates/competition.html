@@ -10,27 +10,31 @@
     <script type="text/javascript">
         var competitionStr = "[[${competition}]]";
         Ext.onReady(function(){
-            var competition = JSON.parse(competitionStr.replace(/&quot;/g,'"'));
+            try{
+                var competition = JSON.parse(competitionStr.replace(/&quot;/g,'"'));
 
-            var compNameLabel = Ext.create('Ext.form.Label', {
-                text: ""
-            });
+                var compNameLabel = Ext.create('Ext.form.Label', {
+                    text: ""
+                });
 
-            Ext.create('Ext.panel.Panel', {
-                renderTo: Ext.getBody(),
-                width: 1000,
-                height:500,
-                layout: 'border',
-                items: [
-                    compNameLabel
-                ]
-            }).center();
+                Ext.create('Ext.panel.Panel', {
+                    renderTo: Ext.getBody(),
+                    width: 1000,
+                    height:500,
+                    layout: 'border',
+                    items: [
+                        compNameLabel
+                    ]
+                }).center();
 
-            var init = function (comp) {
-                compNameLabel.setText(comp.name);
-            };
+                var init = function (comp) {
+                    compNameLabel.setText(comp.name);
+                };
 
-            init(competition);
+                init(competition);
+            } catch(e){
+                alert("Invalid team id")
+            }
         });
     </script>
 </head>

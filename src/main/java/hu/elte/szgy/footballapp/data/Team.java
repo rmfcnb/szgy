@@ -22,7 +22,6 @@ public class Team implements Serializable {
     private static final long serialVersionUID = 1L;
 
     @Id
-    /*@GeneratedValue(strategy = GenerationType.AUTO)*/
     @Column(name = "ID")
     private int teamId;
 
@@ -33,6 +32,12 @@ public class Team implements Serializable {
     @JsonIgnore
     private Set<Competition> competitions = new HashSet<>();
 
+    @OneToMany(mappedBy = "homeTeam", cascade = CascadeType.ALL)
+    private Set<Match> homeMatches;
+
+    @OneToMany(mappedBy = "awayTeam", cascade = CascadeType.ALL)
+    private Set<Match> awayMatches;
+
     public int getTeamId() { return teamId; }
     public void setTeamId(int id) { this.teamId = id; }
 
@@ -42,4 +47,19 @@ public class Team implements Serializable {
     public Set<Competition> getCompetitions() {return competitions;}
     public void setCompetitions(Set<Competition> comps) {this.competitions = comps;}
 
+    public Set<Match> getHomeMatches() {
+        return homeMatches;
+    }
+
+    public void setHomeMatches(Set<Match> homeMatches) {
+        this.homeMatches = homeMatches;
+    }
+
+    public Set<Match> getAwayMatches() {
+        return awayMatches;
+    }
+
+    public void setAwayMatches(Set<Match> awayMatches) {
+        this.awayMatches = awayMatches;
+    }
 }

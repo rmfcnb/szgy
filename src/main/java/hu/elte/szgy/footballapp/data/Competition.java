@@ -20,14 +20,13 @@ public class Competition implements Serializable {
     private static final long serialVersionUID = 1L;
 
     @Id
-    /*@GeneratedValue(strategy = GenerationType.AUTO)*/
     @Column(name = "ID")
     private int compId;
 
     @Column(unique = true)
     private String name;
 
-    @OneToMany(fetch = FetchType.LAZY, mappedBy = "competition")
+    @OneToMany(mappedBy = "competition", cascade = CascadeType.ALL)
     @JsonIgnore
     private Set<Match> matches = new HashSet<>();
 

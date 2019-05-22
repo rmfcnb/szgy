@@ -3,6 +3,7 @@ package hu.elte.szgy.footballapp.rest;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import hu.elte.szgy.footballapp.data.*;
+import org.springframework.beans.TypeMismatchException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -90,7 +91,7 @@ public class CompetitionManager {
         }
 
         Competition newComp = new Competition();
-        newComp.setCompId(getNewId());
+        newComp.setCompId(getNewCompetitionId());
         newComp.setName(comp.getCompetitionName());
         newComp.setTeams(teams);
 
@@ -99,7 +100,13 @@ public class CompetitionManager {
         return new ResponseEntity<>(HttpStatus.OK);
     }
 
-    // TODO: redirect to error page
+    @ExceptionHandler(TypeMismatchException.class)
+    public ModelAndView handleTypeMismatchExceptionInGetCompetition(TypeMismatchException ex){
+        ModelAndView mv = new ModelAndView("competition");
+        mv.setStatus(HttpStatus.NOT_FOUND);
+        return mv;
+    }
+
     @GetMapping("/byId/{id}")
     public ModelAndView getCompetitionById(@PathVariable("id") int compId){
         ModelAndView mv = new ModelAndView("competition");
@@ -115,11 +122,15 @@ public class CompetitionManager {
             }).collect(Collectors.toList());
             compDTO.setTeams(teams);
             try {
-                String json = (new ObjectMapper()).writeValueAsString(compDTO);
-                mv.addObject("competition", json);
+                String competitionJson = (new ObjectMapper()).writeValueAsString(compDTO);
+                mv.addObject("competition", competitionJson);
             } catch (JsonProcessingException e) {
+                mv.setStatus(HttpStatus.INTERNAL_SERVER_ERROR);
                 e.printStackTrace();
             }
+        }
+        else{
+            mv.setStatus(HttpStatus.NOT_FOUND);
         }
 
         return mv;
@@ -139,6 +150,7 @@ public class CompetitionManager {
                 teams.add(team);
             }
 
+            int matchIdx = 0;
             for(int i=0; i<10; i++){
                 comps.add(new League(i, "League "+i));
                 Set<Team> compTeams = new HashSet<>(8);
@@ -150,8 +162,11 @@ public class CompetitionManager {
                     teams.get(j).setCompetitions(teamComps);
                 }
                 comps.get(i).setTeams(compTeams);
-
+                Set<Match> matches = generateMatches(comps.get(i), new LinkedList<>(compTeams), matchIdx);
+                comps.get(i).setMatches(matches);
+                matchIdx = matches.stream().max(Comparator.comparingInt(Match::getMatchId)).get().getMatchId()+1;
             }
+
             if(comps.stream().noneMatch(league -> leagueRepo.findById(league.getCompId()).isPresent())){
                 leagueRepo.saveAll(comps);
             }
@@ -163,13 +178,36 @@ public class CompetitionManager {
         return new ResponseEntity<>(HttpStatus.OK);
     }
 
+    private Set<Match> generateMatches(Competition comp, List<Team> teams, int firstIdx){
+        Set<Match> matches = new HashSet<>();
+        int currId = firstIdx;
+        for(int i=0; i<teams.size()-1; ++i){
+            for(int j=i+1; j<teams.size(); ++j){
+                Match match = new Match();
+                match.setMatchId(currId);
+                currId++;
+                match.setCompetition(comp);
+                match.setHomeTeam(teams.get(i));
+                match.setAwayTeam(teams.get(j));
+                matches.add(match);
+            }
+        }
+
+        return matches;
+    }
+
     private ResponseEntity<Competition> getCompetition(Integer id){
         Competition comp = compRepo.findById(id).get();
         return new ResponseEntity<>(comp, HttpStatus.OK);
     }
 
-    private int getNewId(){
+    private int getNewCompetitionId(){
         Optional<Competition> maxIdComp = compRepo.findAll().stream().max(Comparator.comparingInt(Competition::getCompId));
-        return maxIdComp.map(team -> team.getCompId() + 1).orElse(0);
+        return maxIdComp.map(comp -> comp.getCompId() + 1).orElse(0);
+    }
+
+    private int getNewMatchId(){
+        Optional<Match> maxIdComp = matchRepo.findAll().stream().max(Comparator.comparingInt(Match::getMatchId));
+        return maxIdComp.map(match -> match.getMatchId() + 1).orElse(0);
     }
 }

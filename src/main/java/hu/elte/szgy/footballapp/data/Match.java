@@ -17,34 +17,28 @@ public class Match implements Serializable {
     private static final long serialVersionUID = 1L;
 
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Column(name = "ID")
     private int matchId;
 
-    @ManyToOne
-    @JoinColumn(name = "fk_compId", nullable = false)
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name="competitionId")
     @JsonIgnore
     private Competition competition;
-
-    @Column(name = "fk_compId", insertable = false, updatable = false)
-    private int competitionId;
 
     private int homeGoals;
     private int awayGoals;
 
-    /*private Date date;*/
+    @ManyToOne(cascade = CascadeType.ALL)
+    private Team homeTeam;
+
+    @ManyToOne(cascade = CascadeType.ALL)
+    private Team awayTeam;
 
     public int getMatchId() {
         return matchId;
     }
     public void setMatchId(int id) {
         this.matchId = id;
-    }
-
-    public int getCompetitionId() {
-        return competitionId;
-    }
-    public void setCompetitionId(int id) {
-        this.competitionId = id;
     }
 
     public Competition getCompetition() {
@@ -66,5 +60,21 @@ public class Match implements Serializable {
     }
     public void setAwayGoals(int goals) {
         this.awayGoals = goals;
+    }
+
+    public Team getHomeTeam() {
+        return homeTeam;
+    }
+
+    public void setHomeTeam(Team homeTeam) {
+        this.homeTeam = homeTeam;
+    }
+
+    public Team getAwayTeam() {
+        return awayTeam;
+    }
+
+    public void setAwayTeam(Team awayTeam) {
+        this.awayTeam = awayTeam;
     }
 }
