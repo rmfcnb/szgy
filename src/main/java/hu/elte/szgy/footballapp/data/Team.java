@@ -33,9 +33,11 @@ public class Team implements Serializable {
     private Set<Competition> competitions = new HashSet<>();
 
     @OneToMany(mappedBy = "homeTeam", cascade = CascadeType.ALL)
+    @JsonIgnore
     private Set<Match> homeMatches;
 
     @OneToMany(mappedBy = "awayTeam", cascade = CascadeType.ALL)
+    @JsonIgnore
     private Set<Match> awayMatches;
 
     public int getTeamId() { return teamId; }

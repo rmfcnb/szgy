@@ -11,6 +11,7 @@ import org.springframework.web.bind.annotation.*;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 @RestController
 @RequestMapping("team")
@@ -27,20 +28,22 @@ public class TeamManager {
         return new ResponseEntity<>(teamList, HttpStatus.OK);
     }
 
-    @GetMapping("/{id}")
+    @GetMapping("/byId/{id}")
     public ResponseEntity<Team> getTeam(@PathVariable("id") Integer id){
         Team team = teamRepo.findById(id).get();
         return new ResponseEntity<>(team, HttpStatus.OK);
     }
 
-    @GetMapping("/byname/{name}")
-    public ResponseEntity<Team> getTeamByName(@PathVariable("name") String name){
-        Optional<Team> team = teamRepo.findByName(name);
+    @GetMapping("/byname/")
+    public ResponseEntity<List<Team>> getTeamsByName(){
+        return getTeamsByName("");
+    }
 
-        if(!team.isPresent()){
-            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
-        }
-        return getTeam(team.get().getTeamId());
+    @GetMapping("/byname/{name}")
+    public ResponseEntity<List<Team>> getTeamsByName(@PathVariable(value = "name") String name){
+        List<Team> teams = teamRepo.findAll();
+
+        return new ResponseEntity<>(teams.stream().filter(competition -> competition.getName().toLowerCase().contains(name.toLowerCase())).collect(Collectors.toList()), HttpStatus.OK);
     }
 
     @PostMapping("/new")
