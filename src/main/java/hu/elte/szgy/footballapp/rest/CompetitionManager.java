@@ -66,9 +66,16 @@ public class CompetitionManager {
 
     }
 
+    @GetMapping("/byname/")
+    public ResponseEntity<List<Competition>> getCompetitionsByName(){
+        return getCompetitionsByName("");
+    }
+
     @GetMapping("/byname/{name}")
-    public ResponseEntity<Competition> getCompetitionByName(@PathVariable("name") String name){
-        return getCompetition(compRepo.findByName(name).getCompId());
+    public ResponseEntity<List<Competition>> getCompetitionsByName(@PathVariable(value = "name") String name){
+        List<Competition> competitions = compRepo.findAll();
+
+        return new ResponseEntity<>(competitions.stream().filter(competition -> competition.getName().toLowerCase().contains(name.toLowerCase())).collect(Collectors.toList()), HttpStatus.OK);
     }
 
     @PostMapping("/new")

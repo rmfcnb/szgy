@@ -10,15 +10,15 @@
     <script type="text/javascript">
         Ext.onReady(function(){
             var store = Ext.create('Ext.data.Store', {
-			fields : ['teamName'],
-			data   : {
-				items : [
-					{ teamName : '-' },
-					{ teamName : '-' },
-					{ teamName : '-' },
-					{ teamName : '-' }
-				]
-			},
+                fields : ['teamName'],
+                data   : {
+                    items : [
+                        { teamName : '-' },
+                        { teamName : '-' },
+                        { teamName : '-' },
+                        { teamName : '-' }
+                    ]
+                },
                 proxy  : {
                     type   : 'memory',
                     reader : {
@@ -27,8 +27,6 @@
                     }
                 }
             });
-
-            console.log(store.count());
 
             Ext.define('MyApp.view.MyGridPanel', {
                 extend: 'Ext.grid.Panel',

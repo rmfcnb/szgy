@@ -33,7 +33,7 @@ public class TeamManager {
         return new ResponseEntity<>(team, HttpStatus.OK);
     }
 
-    @GetMapping("/bname/{name}")
+    @GetMapping("/byname/{name}")
     public ResponseEntity<Team> getTeamByName(@PathVariable("name") String name){
         Optional<Team> team = teamRepo.findByName(name);
 
