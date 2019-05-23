@@ -2,7 +2,9 @@ package hu.elte.szgy.footballapp.data;
 
 import java.io.Serializable;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 import javax.persistence.*;
 
@@ -17,7 +19,7 @@ import org.hibernate.annotations.ColumnDefault;
 @Table(name = "team")
 @Inheritance(strategy = InheritanceType.JOINED)
 @JsonTypeInfo(use = JsonTypeInfo.Id.NAME, include = JsonTypeInfo.As.PROPERTY, property = "type")
-@JsonIgnoreProperties({ "type"})
+@JsonIgnoreProperties({"type"})
 public class Team implements Serializable {
     private static final long serialVersionUID = 1L;
 
@@ -63,5 +65,21 @@ public class Team implements Serializable {
 
     public void setAwayMatches(Set<Match> awayMatches) {
         this.awayMatches = awayMatches;
+    }
+
+    public TeamNameDTO getTeamNameDTO(){
+        TeamNameDTO tnDTO = new TeamNameDTO();
+        tnDTO.setName(name);
+        return tnDTO;
+    }
+
+    public TeamDTO getTeamDTO(){
+        TeamDTO tDTO = new TeamDTO();
+        tDTO.setName(name);
+        tDTO.setCompetitions(competitions.stream().map(Competition::getCompetitionNameDTO).collect(Collectors.toList()));
+        List<MatchDTO> matches = homeMatches.stream().map(Match::getMatchDTO).collect(Collectors.toList());
+        matches.addAll(awayMatches.stream().map(Match::getMatchDTO).collect(Collectors.toList()));
+        tDTO.setMatches(matches);
+        return tDTO;
     }
 }

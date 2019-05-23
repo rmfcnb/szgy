@@ -1,12 +1,14 @@
 package hu.elte.szgy.footballapp.rest;
 
-import com.fasterxml.jackson.annotation.JsonCreator;
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import hu.elte.szgy.footballapp.data.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.servlet.ModelAndView;
 
 import java.util.Comparator;
 import java.util.List;
@@ -28,12 +30,6 @@ public class TeamManager {
         return new ResponseEntity<>(teamList, HttpStatus.OK);
     }
 
-    @GetMapping("/byId/{id}")
-    public ResponseEntity<Team> getTeam(@PathVariable("id") Integer id){
-        Team team = teamRepo.findById(id).get();
-        return new ResponseEntity<>(team, HttpStatus.OK);
-    }
-
     @GetMapping("/byname/")
     public ResponseEntity<List<Team>> getTeamsByName(){
         return getTeamsByName("");
@@ -46,8 +42,36 @@ public class TeamManager {
         return new ResponseEntity<>(teams.stream().filter(competition -> competition.getName().toLowerCase().contains(name.toLowerCase())).collect(Collectors.toList()), HttpStatus.OK);
     }
 
+    @GetMapping("/byId/{id}")
+    public ModelAndView getCompetitionById(@PathVariable("id") int teamId){
+        ModelAndView mv = new ModelAndView("team");
+        Optional<Team> team = teamRepo.findById(teamId);
+
+        if(team.isPresent()){
+            TeamDTO teamDTO = new TeamDTO();
+            teamDTO.setName(team.get().getName());
+            List<MatchDTO> matches = team.get().getAwayMatches().stream().map(Match::getMatchDTO).collect(Collectors.toList());
+            matches.addAll(team.get().getHomeMatches().stream().map(Match::getMatchDTO).collect(Collectors.toList()));
+            teamDTO.setMatches(matches);
+            List<CompetitionNameDTO> competitions = team.get().getCompetitions().stream().map(Competition::getCompetitionNameDTO).collect(Collectors.toList());
+            teamDTO.setCompetitions(competitions);
+            try {
+                String teamJson = (new ObjectMapper()).writeValueAsString(teamDTO);
+                mv.addObject("team", teamJson);
+            } catch (JsonProcessingException e) {
+                mv.setStatus(HttpStatus.INTERNAL_SERVER_ERROR);
+                e.printStackTrace();
+            }
+        }
+        else{
+            mv.setStatus(HttpStatus.NOT_FOUND);
+        }
+
+        return mv;
+    }
+
     @PostMapping("/new")
-    public ResponseEntity<Team> createTeam(@RequestBody TeamDTO team){
+    public ResponseEntity<Team> createTeam(@RequestBody TeamNameDTO team){
         Team newTeam = new Team();
         newTeam.setTeamId(getNewId());
         newTeam.setName(team.getName());

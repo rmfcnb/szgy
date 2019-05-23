@@ -8,7 +8,9 @@ import com.fasterxml.jackson.annotation.JsonTypeInfo;
 import javax.persistence.*;
 import java.io.Serializable;
 import java.util.HashSet;
+import java.util.LinkedList;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 @Entity
 @Table(name = "competition")
@@ -63,5 +65,18 @@ public class Competition implements Serializable {
         if (getClass() == Cup.class)
             return "CUP";
         return "????";
+    }
+
+    public CompetitionNameDTO getCompetitionNameDTO(){
+        CompetitionNameDTO cnDTO = new CompetitionDTO();
+        cnDTO.setName(name);
+        return cnDTO;
+    }
+
+    public CompetitionDTO getCompetitionDTO(){
+        CompetitionDTO cDTO = new CompetitionDTO();
+        cDTO.setName(name);
+        cDTO.setTeams(teams.stream().map(Team::getTeamNameDTO).collect(Collectors.toList()));
+        return cDTO;
     }
 }

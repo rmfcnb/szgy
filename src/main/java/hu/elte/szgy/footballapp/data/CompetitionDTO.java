@@ -2,23 +2,14 @@ package hu.elte.szgy.footballapp.data;
 
 import java.util.List;
 
-public class CompetitionDTO {
-    private String name;
-    private List<TeamDTO> teams;
+public class CompetitionDTO extends CompetitionNameDTO {
+    private List<TeamNameDTO> teams;
 
-    public String getName() {
-        return name;
-    }
-
-    public void setName(String name) {
-        this.name = name;
-    }
-
-    public List<TeamDTO> getTeams() {
+    public List<TeamNameDTO> getTeams() {
         return teams;
     }
 
-    public void setTeams(List<TeamDTO> teams) {
+    public void setTeams(List<TeamNameDTO> teams) {
         this.teams = teams;
     }
 }

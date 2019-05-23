@@ -77,4 +77,13 @@ public class Match implements Serializable {
     public void setAwayTeam(Team awayTeam) {
         this.awayTeam = awayTeam;
     }
+
+    public MatchDTO getMatchDTO(){
+        MatchDTO mDTO = new MatchDTO();
+        mDTO.setHomeTeam(homeTeam.getTeamNameDTO());
+        mDTO.setAwayTeam(awayTeam.getTeamNameDTO());
+        mDTO.setHomeGoals(homeGoals);
+        mDTO.setAwayGoals(awayGoals);
+        return mDTO;
+    }
 }

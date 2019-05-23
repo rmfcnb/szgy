@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:th="http://www.thymeleaf.org"
+      xmlns:sec="http://www.thymeleaf.org/thymeleaf-extras-springsecurity3">
+<head>
+    <meta charset="UTF-8">
+    <title>Competition</title>
+    <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/extjs/6.2.0/ext-all-debug.js"></script>
+    <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/extjs/6.2.0/classic/theme-neptune/theme-neptune.js"></script>
+    <script type="text/javascript">
+        var teamStr = "[[${team}]]";
+        Ext.onReady(function(){
+            try{
+                var team = JSON.parse(teamStr.replace(/&quot;/g,'"'));
+
+                var teamNameLabel = Ext.create('Ext.form.Label', {
+                    text: ""
+                });
+
+                Ext.create('Ext.panel.Panel', {
+                    renderTo: Ext.getBody(),
+                    width: 1000,
+                    height:500,
+                    layout: 'border',
+                    items: [
+                        teamNameLabel
+                    ]
+                }).center();
+
+                var init = function (t) {
+                    teamNameLabel.setText(t.name);
+                };
+
+                init(team);
+            } catch(e){
+                alert("Invalid team id")
+            }
+        });
+    </script>
+</head>
+<body>
+<div id="maindiv" style="height: 500px"/>
+</body>
+</html>

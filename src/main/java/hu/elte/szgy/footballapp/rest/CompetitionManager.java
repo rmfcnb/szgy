@@ -36,19 +36,18 @@ public class CompetitionManager {
     @GetMapping("/all")
     public ResponseEntity<List<Competition>> getAllCompetition(@RequestParam(name = "type", required = false) String type) {
         List<Competition> compList = new LinkedList<>();
-            if(type == null){
-                compList = compRepo.findAll();
-            }
-            else if(type.equals("LEAGUE")){
-                compList.addAll(leagueRepo.findAll());
-            }
-            else if(type.equals("CUP")){
-                compList.addAll(cupRepo.findAll());
-            }
-            else{
-                return new ResponseEntity<>(HttpStatus.NOT_FOUND);
-            }
-        //}
+        if(type == null){
+            compList = compRepo.findAll();
+        }
+        else if(type.equals("LEAGUE")){
+            compList.addAll(leagueRepo.findAll());
+        }
+        else if(type.equals("CUP")){
+            compList.addAll(cupRepo.findAll());
+        }
+        else{
+            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+        }
         return new ResponseEntity<>(compList, HttpStatus.OK);
     }
 
@@ -122,11 +121,7 @@ public class CompetitionManager {
         if(comp.isPresent()){
             CompetitionDTO compDTO = new CompetitionDTO();
             compDTO.setName(comp.get().getName());
-            List<TeamDTO> teams = comp.get().getTeams().stream().map(team -> {
-                TeamDTO teamDTO = new TeamDTO();
-                teamDTO.setName(team.getName());
-                return teamDTO;
-            }).collect(Collectors.toList());
+            List<TeamNameDTO> teams = comp.get().getTeams().stream().map(Team::getTeamNameDTO).collect(Collectors.toList());
             compDTO.setTeams(teams);
             try {
                 String competitionJson = (new ObjectMapper()).writeValueAsString(compDTO);
