@@ -1,12 +1,21 @@
 package hu.elte.szgy.footballapp.data;
 
 public class MatchDTO {
+    private int matchId;
     private TeamNameDTO homeTeam;
     private TeamNameDTO awayTeam;
     private CompetitionNameDTO competition;
 
     private int homeGoals;
     private int awayGoals;
+
+    public int getMatchId() {
+        return matchId;
+    }
+
+    public void setMatchId(int matchId) {
+        this.matchId = matchId;
+    }
 
     public TeamNameDTO getHomeTeam() {
         return homeTeam;

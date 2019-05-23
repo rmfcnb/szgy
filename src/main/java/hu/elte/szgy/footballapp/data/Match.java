@@ -80,6 +80,7 @@ public class Match implements Serializable {
 
     public MatchDTO getMatchDTO(){
         MatchDTO mDTO = new MatchDTO();
+        mDTO.setMatchId(matchId);
         mDTO.setHomeTeam(homeTeam.getTeamNameDTO());
         mDTO.setAwayTeam(awayTeam.getTeamNameDTO());
         mDTO.setHomeGoals(homeGoals);

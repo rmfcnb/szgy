@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:th="http://www.thymeleaf.org"
+      xmlns:sec="http://www.thymeleaf.org/thymeleaf-extras-springsecurity3">
+<head>
+    <meta charset="UTF-8">
+    <title>Edit Match</title>
+    <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/extjs/6.2.0/ext-all-debug.js"></script>
+    <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/extjs/6.2.0/classic/theme-neptune/theme-neptune.js"></script>
+    <script type="text/javascript">
+        var matchStr = "[[${match}]]";
+        Ext.onReady(function(){
+            try{
+                var match = JSON.parse(matchStr.replace(/&quot;/g,'"'));
+
+                var homeTeamGoalsField = Ext.create('Ext.form.TextField',{
+                    value: match.homeGoals,
+                    fieldLabel: match.homeTeam.name,
+                    allowBlank: false
+                });
+
+                var awayTeamGoalsField = Ext.create('Ext.form.TextField',{
+                    value: match.awayGoals,
+                    fieldLabel: match.awayTeam.name,
+                    allowBlank: false
+                });
+
+                var cancelButton = Ext.create('Ext.button.Button', {
+                    text: 'Cancel',
+                    handler: function() {
+
+                    }
+                });
+                var submitButton = Ext.create('Ext.button.Button', {
+                    text: 'Submit',
+                    handler: function() {
+                        match.homeGoals = homeTeamGoalsField.getValue();
+                        match.awayGoals = awayTeamGoalsField.getValue();
+                        Ext.Ajax.request({
+                            url: '/match/editMatch',
+                            method: 'POST',
+                            jsonData: match,
+                            success: function (form, action) {
+                                alert(form.responseText);
+                            },
+                            failure: function (form, action) {
+                                alert(form.responseText);
+                            }
+                        });
+                    }
+                });
+
+                Ext.create('Ext.panel.Panel', {
+                    renderTo: Ext.getBody(),
+                    width: 1000,
+                    height:500,
+                    layout: 'border',
+                    items: [
+                        homeTeamGoalsField,
+                        awayTeamGoalsField
+                    ],
+                    buttons: [
+                        cancelButton,
+                        submitButton
+                    ]
+                });
+            } catch(e){
+                alert("Invalid team id")
+            }
+        });
+    </script>
+</head>
+<body>
+<div id="maindiv" style="height: 500px"/>
+</body>
+</html>
