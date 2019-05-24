@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:th="http://www.thymeleaf.org"
+      xmlns:sec="http://www.thymeleaf.org/thymeleaf-extras-springsecurity3">
+<head>
+    <meta charset="UTF-8">
+    <title>Favourites</title>
+    <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/extjs/6.2.0/ext-all-debug.js"></script>
+    <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/extjs/6.2.0/classic/theme-neptune/theme-neptune.js"></script>
+    <script type="text/javascript">
+        var favStr = "[[${favourites}]]";
+        Ext.onReady(function(){
+            try{
+                var favourite = JSON.parse(favStr.replace(/&quot;/g,'"'));
+
+                Ext.define('MyApp.view.CompetitionGridPanel', {
+                    extend: 'Ext.grid.Panel',
+                    alias: 'widget.mygridpanel',
+                    height: 315,
+                    width: 784,
+                    title: 'Competitions',
+                    store: store,
+
+                    columns: [  {
+                        text: 'Name',
+                        width: 100,
+                        sortable: false,
+                        hideable: false,
+                        dataIndex: 'competition'
+                    }],
+                    plugins: [{
+                        ptype: 'cellediting',
+                        autoCancel: false,
+                        clicksToEdit: 1
+                    }],
+                    viewConfig : {
+                        listeners : {
+                            itemdblclick : function(view, cell, cellIndex, record, row, rowIndex, e) {
+                                window.location.assign("/competition/byId/"+cell.data.id);
+                            }
+                        }
+                    }
+                });
+
+                var compGrid = Ext.create('MyApp.view.CompetitionGridPanel', {
+                    renderTo: Ext.getBody()
+                });
+
+                Ext.define('MyApp.view.TeamGridPanel', {
+                    extend: 'Ext.grid.Panel',
+                    alias: 'widget.mygridpanel',
+                    height: 315,
+                    width: 784,
+                    title: 'Teams',
+                    store: store,
+
+                    columns: [  {
+                        text: 'Bane',
+                        width: 100,
+                        sortable: false,
+                        hideable: false,
+                        dataIndex: 'team'
+                    }],
+                    plugins: [{
+                        ptype: 'cellediting',
+                        autoCancel: false,
+                        clicksToEdit: 1
+                    }],
+                    viewConfig : {
+                        listeners : {
+                            itemdblclick : function(view, cell, cellIndex, record, row, rowIndex, e) {
+                                window.location.assign("/team/byId/"+cell.data.id);
+                            }
+                        }
+                    }
+                });
+
+                var teamGrid = Ext.create('MyApp.view.TeamGridPanel', {
+                    renderTo: Ext.getBody()
+                });
+            } catch(e){
+                alert("Invalid team id")
+            }
+        });
+    </script>
+</head>
+<body>
+    <div id="maindiv" style="height: 500px"/>
+</body>
+</html>
