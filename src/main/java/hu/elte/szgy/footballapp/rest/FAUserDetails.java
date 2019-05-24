@@ -10,15 +10,13 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 
-public class FAUserPrincipal implements UserDetails {
+public class FAUserDetails implements UserDetails {
 
     private User user;
     private List<GrantedAuthority> auths=new ArrayList<GrantedAuthority>(5);
 
-    public FAUserPrincipal(User user){
+    public FAUserDetails(User user){
         this.user = user;
-
-        throw new UnsupportedOperationException();
     }
 
     @Override

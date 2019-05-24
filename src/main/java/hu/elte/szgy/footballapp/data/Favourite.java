@@ -6,6 +6,7 @@ import javax.persistence.*;
 import java.io.Serializable;
 import java.util.HashSet;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 @Entity
 @Table(name="favourite")
@@ -62,8 +63,8 @@ public class Favourite implements Serializable {
 
     public FavouriteDTO getFavouriteDTO(){
         FavouriteDTO fDTO = new FavouriteDTO();
-        /*fDTO.setCompetitions(competitions.stream().map(Competition::getCompetitionNameDTO).collect(Collectors.toList()));
-        fDTO.setTeams(teams.stream().map(Team::getTeamNameDTO).collect(Collectors.toList()));*/
+        fDTO.setCompetitions(competitions.stream().map(Competition::getCompetitionNameDTO).collect(Collectors.toList()));
+        fDTO.setTeams(teams.stream().map(Team::getTeamNameDTO).collect(Collectors.toList()));
         return fDTO;
     }
 }

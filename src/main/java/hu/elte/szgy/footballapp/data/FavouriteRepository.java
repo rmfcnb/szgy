@@ -9,5 +9,5 @@ import java.util.Optional;
 @Transactional
 @Repository
 public interface FavouriteRepository extends JpaRepository<Favourite, Integer> {
-    public Optional<Favourite> findByUser(String username);
+    public Optional<Favourite> findByUser(User user);
 }

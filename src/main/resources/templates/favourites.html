@@ -11,15 +11,14 @@
         var favStr = "[[${favourites}]]";
         Ext.onReady(function(){
             try{
-                var favourite = JSON.parse(favStr.replace(/&quot;/g,'"'));
-
+                var favourites = JSON.parse(favStr.replace(/&quot;/g,'"'));
+                console.log(favourites);
                 Ext.define('MyApp.view.CompetitionGridPanel', {
                     extend: 'Ext.grid.Panel',
-                    alias: 'widget.mygridpanel',
                     height: 315,
                     width: 784,
                     title: 'Competitions',
-                    store: store,
+                    store: favourites.competitions,
 
                     columns: [  {
                         text: 'Name',
@@ -48,14 +47,13 @@
 
                 Ext.define('MyApp.view.TeamGridPanel', {
                     extend: 'Ext.grid.Panel',
-                    alias: 'widget.mygridpanel',
                     height: 315,
                     width: 784,
                     title: 'Teams',
-                    store: store,
+                    store: favourites.teams,
 
                     columns: [  {
-                        text: 'Bane',
+                        text: 'Name',
                         width: 100,
                         sortable: false,
                         hideable: false,
@@ -79,7 +77,7 @@
                     renderTo: Ext.getBody()
                 });
             } catch(e){
-                alert("Invalid team id")
+                alert("Invalid favourite")
             }
         });
     </script>

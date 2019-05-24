@@ -33,11 +33,10 @@ public class UserManager {
         SecurityContext cc = SecurityContextHolder.getContext();
         HttpHeaders headers = new HttpHeaders();
         if (cc.getAuthentication() != null) {
-            Authentication a = cc.getAuthentication();
+            Authentication auth = cc.getAuthentication();
             try {
-                headers.setLocation(
-                        new URI("/" + userRepo.getOne(a.getName()).getType().toString().toLowerCase() + "_home.html"));
-            } catch (URISyntaxException e) {}
+                headers.setLocation(new URI("/home"));
+            } catch (URISyntaxException ignored) {}
         }
 
         return new ResponseEntity<>(headers, HttpStatus.FOUND);
@@ -46,10 +45,11 @@ public class UserManager {
     @PostMapping("/new")
     public ResponseEntity<Void> createUser(@RequestBody User user){
 
-        if(userRepo.findById(user.getUsername()).isPresent()){
+        if(userRepo.findById(user.getUsername()).isPresent() || user.getPassword().length() == 0){
             return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
         }
 
+        user.setPassword("{noop}"+user.getPassword());
         user.setType(User.UserType.USER);
         Favourite fav = new Favourite();
         fav.setFavId(getNewFavouriteId());
@@ -62,17 +62,6 @@ public class UserManager {
         }
 
         return new ResponseEntity<>(HttpStatus.OK);
-    }
-
-    public Optional<User> getCurrentUser(){
-        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-        Optional<User> currentUser = Optional.empty();
-        if (!(authentication instanceof AnonymousAuthenticationToken)) {
-            String currentUserName = authentication.getName();
-            currentUser = userRepo.findById(currentUserName);
-        }
-
-        return currentUser;
     }
 
     private int getNewFavouriteId(){
