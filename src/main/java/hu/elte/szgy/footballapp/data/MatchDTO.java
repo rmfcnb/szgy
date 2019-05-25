@@ -9,6 +9,8 @@ public class MatchDTO {
     private int homeGoals;
     private int awayGoals;
 
+    private Boolean wasPlayed;
+
     public int getMatchId() {
         return matchId;
     }
@@ -55,5 +57,13 @@ public class MatchDTO {
 
     public void setAwayGoals(int awayGoals) {
         this.awayGoals = awayGoals;
+    }
+
+    public Boolean getWasPlayed() {
+        return wasPlayed;
+    }
+
+    public void setWasPlayed(Boolean wasPlayed) {
+        this.wasPlayed = wasPlayed;
     }
 }

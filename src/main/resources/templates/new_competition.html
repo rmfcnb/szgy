@@ -5,6 +5,7 @@
 <head>
     <meta charset="UTF-8">
     <title>New Competition</title>
+    <link rel="stylesheet" type="text/css" href="https://cdnjs.cloudflare.com/ajax/libs/extjs/6.2.0/classic/theme-neptune/resources/theme-neptune-all.css">
     <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/extjs/6.2.0/ext-all-debug.js"></script>
     <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/extjs/6.2.0/classic/theme-neptune/theme-neptune.js"></script>
     <script type="text/javascript">
@@ -36,12 +37,13 @@
                 title: 'Teams',
                 store: store,
 
-                columns: [  { editor : {
-                                xtype : 'textfield',
-                                allowBlank : false
-                            },
-                            dataIndex : 'teamName',
-                            flex : 1
+                columns: [  {
+                    editor : {
+                        xtype : 'textfield',
+                        allowBlank : false
+                    },
+                    dataIndex : 'teamName',
+                    flex : 1
                 }],
                 plugins: [{
                     ptype: 'cellediting',
@@ -105,8 +107,9 @@
                 }
             };
 
-            var nameField = new Ext.form.TextField({
-                text: '',
+            var nameField = Ext.create('Ext.form.TextField',{
+                emptyText: "New Competition Name",
+                fieldLabel: "Competition name",
                 allowBlank: false
             });
 
@@ -117,10 +120,13 @@
                 layout: 'border',
                 items: [
                     nameField,
+                    { region:'west', width: 100 },
+                    grid,
+                    { region:'east', width: 140}
+                ],
+                buttons: [
                     addButton,
                     removeButton,
-                    grid,
-                    { region:'east', width: 140},
                     createButton
                 ]
             }).center();

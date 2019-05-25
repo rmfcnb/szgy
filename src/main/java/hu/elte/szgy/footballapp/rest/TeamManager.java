@@ -10,9 +10,7 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.ModelAndView;
 
-import java.util.Comparator;
-import java.util.List;
-import java.util.Optional;
+import java.util.*;
 import java.util.stream.Collectors;
 
 @RestController
@@ -77,6 +75,23 @@ public class TeamManager {
         newTeam.setName(team.getName());
         teamRepo.saveAndFlush(newTeam);
         return new ResponseEntity<>(newTeam, HttpStatus.OK);
+    }
+
+    @GetMapping("/home")
+    public ResponseEntity<List<Team>> getCompetitionsForHome(){
+        List<Team> allTeams = teamRepo.findAll();
+        Collections.shuffle(allTeams);
+        List<Team> teams = new LinkedList<>();
+
+        int teamNum = allTeams.size() > 10 ? 10 : allTeams.size();
+
+        for(int i = 0; i<teamNum; ++i){
+            teams.add(allTeams.get(i));
+        }
+
+        teams.sort(Comparator.comparing(Team::getName));
+
+        return new ResponseEntity<>(teams, HttpStatus.OK);
     }
 
     private int getNewId(){

@@ -5,6 +5,7 @@
 <head>
     <meta charset="UTF-8">
     <title>Competition</title>
+    <link rel="stylesheet" type="text/css" href="https://cdnjs.cloudflare.com/ajax/libs/extjs/6.2.0/classic/theme-neptune/resources/theme-neptune-all.css">
     <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/extjs/6.2.0/ext-all-debug.js"></script>
     <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/extjs/6.2.0/classic/theme-neptune/theme-neptune.js"></script>
     <script type="text/javascript">
@@ -14,7 +15,7 @@
                 var team = JSON.parse(teamStr.replace(/&quot;/g,'"'));
 
                 var teamNameLabel = Ext.create('Ext.form.Label', {
-                    text: ""
+                    text: team.name
                 });
 
                 Ext.create('Ext.panel.Panel', {
@@ -26,12 +27,6 @@
                         teamNameLabel
                     ]
                 }).center();
-
-                var init = function (t) {
-                    teamNameLabel.setText(t.name);
-                };
-
-                init(team);
             } catch(e){
                 alert("Invalid team id")
             }

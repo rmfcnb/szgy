@@ -5,6 +5,7 @@
 <head>
     <meta charset="UTF-8">
     <title>Competition</title>
+    <link rel="stylesheet" type="text/css" href="https://cdnjs.cloudflare.com/ajax/libs/extjs/6.2.0/classic/theme-neptune/resources/theme-neptune-all.css">
     <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/extjs/6.2.0/ext-all-debug.js"></script>
     <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/extjs/6.2.0/classic/theme-neptune/theme-neptune.js"></script>
     <script type="text/javascript">
@@ -13,25 +14,187 @@
             try{
                 var competition = JSON.parse(competitionStr.replace(/&quot;/g,'"'));
 
-                var compNameLabel = Ext.create('Ext.form.Label', {
-                    text: ""
+                console.log(competition);
+
+                var store = Ext.create('Ext.data.Store', {
+                    fields : ['name','matches','wins','draws','loses','goals','goalsAgainst','goalDif', 'points'],
+                    proxy  : {
+                        type   : 'memory',
+                        reader : {
+                            type : 'json',
+                            rootProperty : 'items'
+                        }
+                    }
                 });
+
+                var matchStore = Ext.create('Ext.data.Store', {
+                    fields : ['hteam','hgoals','agoals','ateam'],
+                    proxy  : {
+                        type   : 'memory',
+                        reader : {
+                            type : 'json',
+                            rootProperty : 'items'
+                        }
+                    }
+                });
+
+                var compNameLabel = Ext.create('Ext.form.Label', {
+                    text: competition.name
+                });
+
+                Ext.define('MyApp.view.CompetitionPanel', {
+                    extend: 'Ext.grid.Panel',
+                    height: 500,
+                    width: 1000,
+                    title: 'Teams',
+                    store: store,
+
+                    columns: [  {
+                        text: 'Name',
+                        width: 100,
+                        sortable: false,
+                        hideable: false,
+                        dataIndex: 'name'
+                    },{
+                        text: 'Matches',
+                        width: 100,
+                        sortable: false,
+                        hideable: false,
+                        dataIndex: 'matches'
+                    },{
+                        text: 'Wins',
+                        width: 100,
+                        sortable: false,
+                        hideable: false,
+                        dataIndex: 'wins'
+                    },{
+                        text: 'Draws',
+                        width: 100,
+                        sortable: false,
+                        hideable: false,
+                        dataIndex: 'draws'
+                    },{
+                        text: 'Loses',
+                        width: 100,
+                        sortable: false,
+                        hideable: false,
+                        dataIndex: 'loses'
+                    },{
+                        text: 'Goals',
+                        width: 100,
+                        sortable: false,
+                        hideable: false,
+                        dataIndex: 'goals'
+                    },{
+                        text: 'Goals Against',
+                        width: 100,
+                        sortable: false,
+                        hideable: false,
+                        dataIndex: 'goalsAgainst'
+                    },{
+                        text: 'Goal Difference',
+                        width: 100,
+                        sortable: false,
+                        hideable: false,
+                        dataIndex: 'goalDif'
+                    },{
+                        text: 'Points',
+                        width: 100,
+                        sortable: false,
+                        hideable: false,
+                        dataIndex: 'points'
+                    }],
+                    plugins: [{
+                        ptype: 'cellediting',
+                        autoCancel: false,
+                        clicksToEdit: 1
+                    }],
+                    viewConfig : {
+                        listeners : {
+                            itemdblclick : function(view, cell, cellIndex, record, row, rowIndex, e) {
+                                window.location.assign("/team/byId/"+cell.data.id);
+                            }
+                        }
+                    }
+                });
+
+                var grid = Ext.create('MyApp.view.CompetitionPanel', {
+                    renderTo: Ext.getBody()
+                });
+
+                Ext.define('MyApp.view.MatchPanel', {
+                    extend: 'Ext.grid.Panel',
+                    height: 500,
+                    width: 1000,
+                    title: 'Matches',
+                    store: matchStore,
+
+                    columns: [  {
+                        text: 'Home Team',
+                        width: 100,
+                        sortable: false,
+                        hideable: false,
+                        dataIndex: 'hteam'
+                    },{
+                        text: 'Home Goals',
+                        width: 100,
+                        sortable: false,
+                        hideable: false,
+                        dataIndex: 'hgoals'
+                    },{
+                        text: 'Away Goals',
+                        width: 100,
+                        sortable: false,
+                        hideable: false,
+                        dataIndex: 'agoals'
+                    },{
+                        text: 'Away Team',
+                        width: 100,
+                        sortable: false,
+                        hideable: false,
+                        dataIndex: 'ateam'
+                    }],
+                    viewConfig : {
+                        listeners : {
+                            itemdblclick : function(view, cell, cellIndex, record, row, rowIndex, e) {
+                                window.location.assign("/match/editMatch/"+cell.data.id);
+                            }
+                        }
+                    }
+                });
+
+                var matchGrid = Ext.create('MyApp.view.MatchPanel', {
+                    renderTo: Ext.getBody()
+                });
+
+                for(var i = 0; i<competition.content.length; i++){
+                    store.add({ id: competition.content[i].teamId, name: competition.content[i].name, matches: competition.content[i].matches,
+                        wins: competition.content[i].wins, draws: competition.content[i].draws, loses: competition.content[i].loses,
+                        goals: competition.content[i].goals, goalsAgainst: competition.content[i].goalsAgainst, goalDif: competition.content[i].goalDif,
+                        points: competition.content[i].points });
+                }
+
+                for(var j = 0; j<competition.matches.length; j++){
+                    matchStore.add({id: competition.matches[j].matchId, hteam: competition.matches[j].homeTeam.name, hgoals: competition.matches[j].homeGoals,
+                        agoals: competition.matches[j].awayGoals, ateam: competition.matches[j].awayTeam.name});
+                }
 
                 Ext.create('Ext.panel.Panel', {
                     renderTo: Ext.getBody(),
                     width: 1000,
-                    height:500,
-                    layout: 'border',
+                    height: 800,
+                    layout: {
+                        type: 'vbox',
+                        align: 'stretch',
+                        padding: 5
+                    },
+
                     items: [
-                        compNameLabel
+                        compNameLabel,
+                        grid,
+                        matchGrid
                     ]
-                }).center();
-
-                var init = function (comp) {
-                    compNameLabel.setText(comp.name);
-                };
-
-                init(competition);
+                });//.center();
             } catch(e){
                 alert("Invalid team id")
             }

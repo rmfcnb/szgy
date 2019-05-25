@@ -5,6 +5,7 @@
 <head>
     <meta charset="UTF-8">
     <title>Edit Match</title>
+    <link rel="stylesheet" type="text/css" href="https://cdnjs.cloudflare.com/ajax/libs/extjs/6.2.0/classic/theme-neptune/resources/theme-neptune-all.css">
     <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/extjs/6.2.0/ext-all-debug.js"></script>
     <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/extjs/6.2.0/classic/theme-neptune/theme-neptune.js"></script>
     <script type="text/javascript">
@@ -50,6 +51,11 @@
                     }
                 });
 
+                var wasPlayed = Ext.create('Ext.form.field.Checkbox',{
+                    boxLabel: 'Played',
+                    value: match.wasPlayed
+                });
+
                 Ext.create('Ext.panel.Panel', {
                     renderTo: Ext.getBody(),
                     width: 1000,
@@ -57,7 +63,8 @@
                     layout: 'border',
                     items: [
                         homeTeamGoalsField,
-                        awayTeamGoalsField
+                        awayTeamGoalsField,
+                        wasPlayed
                     ],
                     buttons: [
                         cancelButton,

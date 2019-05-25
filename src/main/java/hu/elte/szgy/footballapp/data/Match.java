@@ -34,6 +34,8 @@ public class Match implements Serializable {
     @ManyToOne(cascade = CascadeType.ALL)
     private Team awayTeam;
 
+    private Boolean wasPlayed = false;
+
     public int getMatchId() {
         return matchId;
     }
@@ -78,6 +80,26 @@ public class Match implements Serializable {
         this.awayTeam = awayTeam;
     }
 
+    public Boolean getWasPlayed() {
+        return wasPlayed;
+    }
+
+    public Boolean isHomeWin(){
+        return homeGoals > awayGoals;
+    }
+
+    public Boolean isAwayWin(){
+        return homeGoals < awayGoals;
+    }
+
+    public Boolean isDraw(){
+        return homeGoals == awayGoals;
+    }
+
+    public void setWasPlayed(Boolean wasPlayed) {
+        this.wasPlayed = wasPlayed;
+    }
+
     public MatchDTO getMatchDTO(){
         MatchDTO mDTO = new MatchDTO();
         mDTO.setMatchId(matchId);
@@ -85,6 +107,7 @@ public class Match implements Serializable {
         mDTO.setAwayTeam(awayTeam.getTeamNameDTO());
         mDTO.setHomeGoals(homeGoals);
         mDTO.setAwayGoals(awayGoals);
+        mDTO.setWasPlayed(wasPlayed);
         return mDTO;
     }
 }

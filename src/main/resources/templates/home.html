@@ -9,7 +9,129 @@
     <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/extjs/6.2.0/classic/theme-neptune/theme-neptune.js"></script>
     <script type="text/javascript">
         Ext.onReady(function () {
+            var compStore = Ext.create('Ext.data.Store', {
+                fields : ['name', 'type'],
+                proxy  : {
+                    type   : 'memory',
+                    reader : {
+                        type : 'json',
+                        rootProperty : 'items'
+                    }
+                }
+            });
 
+            var teamStore = Ext.create('Ext.data.Store', {
+                fields : ['name'],
+                proxy  : {
+                    type   : 'memory',
+                    reader : {
+                        type : 'json',
+                        rootProperty : 'items'
+                    }
+                }
+            });
+
+            Ext.define('MyApp.view.CompetitionGridPanel', {
+                extend: 'Ext.grid.Panel',
+                height: 315,
+                width: 784,
+                title: 'Competitions',
+                store: compStore,
+
+                columns: [  {
+                    text: 'Name',
+                    width: 100,
+                    sortable: false,
+                    hideable: false,
+                    dataIndex: 'name'
+                },{
+                    text: 'Type',
+                    width: 100,
+                    sortable: false,
+                    hideable: false,
+                    dataIndex: 'type'
+                }],
+                plugins: [{
+                    ptype: 'cellediting',
+                    autoCancel: false,
+                    clicksToEdit: 1
+                }],
+                viewConfig : {
+                    listeners : {
+                        itemdblclick : function(view, cell, cellIndex, record, row, rowIndex, e) {
+                            window.location.assign("/competition/byId/"+cell.data.id);
+                        }
+                    }
+                }
+            });
+
+            var compGrid = Ext.create('MyApp.view.CompetitionGridPanel', {
+                renderTo: Ext.getBody()
+            });
+
+            Ext.define('MyApp.view.TeamGridPanel', {
+                extend: 'Ext.grid.Panel',
+                height: 315,
+                width: 784,
+                title: 'Teams',
+                store: teamStore,
+
+                columns: [  {
+                    text: 'Name',
+                    width: 100,
+                    sortable: false,
+                    hideable: false,
+                    dataIndex: 'name'
+                }],
+                plugins: [{
+                    ptype: 'cellediting',
+                    autoCancel: false,
+                    clicksToEdit: 1
+                }],
+                viewConfig : {
+                    listeners : {
+                        itemdblclick : function(view, cell, cellIndex, record, row, rowIndex, e) {
+                            window.location.assign("/team/byId/"+cell.data.id);
+                        }
+                    }
+                }
+            });
+
+            var teamGrid = Ext.create('MyApp.view.TeamGridPanel', {
+                renderTo: Ext.getBody()
+            });
+
+            Ext.Ajax.request({
+                url: '/competition/home',
+                method: 'GET',
+                success: function (form, action) {
+                    var competitions = Ext.JSON.decode(form.responseText);
+                    compStore.removeAll();
+                    console.log(competitions);
+                    for(var i = 0; i<competitions.length; i++){
+                        compStore.add({id: competitions[i].compId, name : competitions[i].name, type: competitions[i].type});
+                    }
+                },
+                failure: function (form, action) {
+                    alert('Failed', form.responseText);
+                }
+            });
+
+            Ext.Ajax.request({
+                url: '/team/home',
+                method: 'GET',
+                success: function (form, action) {
+                    var teams = Ext.JSON.decode(form.responseText);
+                    teamStore.removeAll();
+                    console.log(teams);
+                    for(var i = 0; i<teams.length; i++){
+                        teamStore.add({id: teams[i].teamId, name : teams[i].name});
+                    }
+                },
+                failure: function (form, action) {
+                    alert('Failed', form.responseText);
+                }
+            });
         });
     </script>
 </head>

@@ -82,4 +82,39 @@ public class Team implements Serializable {
         tDTO.setMatches(matches);
         return tDTO;
     }
+
+    public CompetitionTableRecordDTO getCompetitionTableRecordDTO(int compId){
+        CompetitionTableRecordDTO ctrDTO = new CompetitionTableRecordDTO();
+
+        List<Match> hMatches = homeMatches.stream().filter(match -> match.getCompetition().getCompId() == compId).collect(Collectors.toList());
+        List<Match> aMatches = awayMatches.stream().filter(match -> match.getCompetition().getCompId() == compId).collect(Collectors.toList());
+
+        ctrDTO.setTeamId(teamId);
+        ctrDTO.setName(name);
+
+        int winNum = (int)hMatches.stream().filter(match -> match.getWasPlayed() && match.isHomeWin()).count()+
+                (int)aMatches.stream().filter(match -> match.getWasPlayed() && match.isAwayWin()).count();
+
+        int drawNum = (int)hMatches.stream().filter(match -> match.getWasPlayed() && match.isDraw()).count()+
+                (int)aMatches.stream().filter(match -> match.getWasPlayed() && match.isDraw()).count();
+
+        ctrDTO.setWins(winNum);
+        ctrDTO.setDraws(drawNum);
+        ctrDTO.setLoses((int)hMatches.stream().filter(match -> match.getWasPlayed() && match.isAwayWin()).count()+
+                (int)aMatches.stream().filter(match -> match.getWasPlayed() && match.isHomeWin()).count());
+
+        ctrDTO.setMatches(hMatches.size() + aMatches.size());
+
+        int goals = hMatches.stream().map(Match::getHomeGoals).reduce(0, Integer::sum)+
+                aMatches.stream().map(Match::getAwayGoals).reduce(0, Integer::sum);
+
+        int goalsAgainst = aMatches.stream().map(Match::getHomeGoals).reduce(0, Integer::sum)+
+                hMatches.stream().map(Match::getAwayGoals).reduce(0, Integer::sum);
+
+        ctrDTO.setGoals(goals);
+        ctrDTO.setGoalsAgainst(goalsAgainst);
+        ctrDTO.setGoalDif(goals-goalsAgainst);
+        ctrDTO.setPoints((winNum*3) + drawNum);
+        return ctrDTO;
+    }
 }

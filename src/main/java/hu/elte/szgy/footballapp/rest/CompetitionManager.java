@@ -119,10 +119,10 @@ public class CompetitionManager {
         Optional<Competition> comp = compRepo.findById(compId);
 
         if(comp.isPresent()){
-            CompetitionDTO compDTO = new CompetitionDTO();
+            CompetitionTableDTO compDTO = new CompetitionTableDTO();
             compDTO.setName(comp.get().getName());
-            List<TeamNameDTO> teams = comp.get().getTeams().stream().map(Team::getTeamNameDTO).collect(Collectors.toList());
-            compDTO.setTeams(teams);
+            compDTO.setContent(comp.get().getTeams().stream().map(team -> team.getCompetitionTableRecordDTO(compId)).collect(Collectors.toList()));
+            compDTO.setMatches(matchRepo.findAll().stream().filter(match -> match.getCompetition().getCompId() == compId).map(Match::getMatchDTO).collect(Collectors.toList()));
             try {
                 String competitionJson = (new ObjectMapper()).writeValueAsString(compDTO);
                 mv.addObject("competition", competitionJson);
@@ -136,6 +136,23 @@ public class CompetitionManager {
         }
 
         return mv;
+    }
+
+    @GetMapping("/home")
+    public ResponseEntity<List<Competition>> getCompetitionsForHome(){
+        List<Competition> allComp = compRepo.findAll();
+        Collections.shuffle(allComp);
+        List<Competition> competitions = new LinkedList<>();
+
+        int compNum = allComp.size() > 10 ? 10 : allComp.size();
+
+        for(int i = 0; i<compNum; ++i){
+            competitions.add(allComp.get(i));
+        }
+
+        competitions.sort(Comparator.comparing(Competition::getName));
+
+        return new ResponseEntity<>(competitions, HttpStatus.OK);
     }
 
     @GetMapping("/generateCompetitions")
