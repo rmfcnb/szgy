@@ -10,7 +10,6 @@ import java.util.stream.Collectors;
 
 @Entity
 @Table(name="favourite")
-@PrimaryKeyJoinColumn(name = "favId")
 public class Favourite implements Serializable {
     private static final long serialVersionUID = 1L;
 
