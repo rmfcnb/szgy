@@ -25,10 +25,10 @@ public class FAWebSecurity extends WebSecurityConfigurerAdapter {
                     .antMatchers("/competition/all").permitAll()
                     .antMatchers("/competitions").permitAll()
                     .antMatchers("/competition/allcomp").permitAll()
-                    .antMatchers("/competition/generateCompetitions").hasAnyRole("ADMIN")
+/*                    .antMatchers("/competition/generateCompetitions").hasAnyRole("ADMIN")
                     .antMatchers("/newCompetition").hasAnyRole("ADMIN")
                     .antMatchers("/newTeam").hasAnyRole("ADMIN")
-                    .antMatchers("/editMatch*").hasAnyRole("ADMIN")
+                    .antMatchers("/editMatch*").hasAnyRole("ADMIN")*/
                     .antMatchers("/favourite/all").hasAnyRole("ADMIN","USER")
                     .antMatchers(HttpMethod.GET, "/","/extjs/**").permitAll()
                     .and()
