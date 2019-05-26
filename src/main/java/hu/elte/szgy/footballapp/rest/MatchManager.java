@@ -28,6 +28,7 @@ public class MatchManager {
         if(match.isPresent()){
             match.get().setHomeGoals(matchDTO.getHomeGoals());
             match.get().setAwayGoals(matchDTO.getAwayGoals());
+            match.get().setWasPlayed(matchDTO.getWasPlayed());
             return new ResponseEntity(HttpStatus.OK);
         }
 

@@ -26,6 +26,11 @@
                     allowBlank: false
                 });
 
+                var wasPlayed = Ext.create('Ext.form.field.Checkbox',{
+                    boxLabel: 'Played',
+                    value: match.wasPlayed
+                });
+
                 var cancelButton = Ext.create('Ext.button.Button', {
                     text: 'Cancel',
                     handler: function() {
@@ -37,12 +42,13 @@
                     handler: function() {
                         match.homeGoals = homeTeamGoalsField.getValue();
                         match.awayGoals = awayTeamGoalsField.getValue();
+                        match.wasPlayed = wasPlayed.getValue();
                         Ext.Ajax.request({
                             url: '/match/editMatch',
                             method: 'POST',
                             jsonData: match,
                             success: function (form, action) {
-                                alert(form.responseText);
+                                alert("Match saved");
                             },
                             failure: function (form, action) {
                                 alert(form.responseText);
@@ -51,16 +57,15 @@
                     }
                 });
 
-                var wasPlayed = Ext.create('Ext.form.field.Checkbox',{
-                    boxLabel: 'Played',
-                    value: match.wasPlayed
-                });
-
                 Ext.create('Ext.panel.Panel', {
                     renderTo: Ext.getBody(),
-                    width: 1000,
-                    height:500,
-                    layout: 'border',
+                    width: 500,
+                    height: 200,
+                    layout: {
+                        type: 'vbox',
+                        align: 'stretch',
+                        padding: 5
+                    },
                     items: [
                         homeTeamGoalsField,
                         awayTeamGoalsField,
