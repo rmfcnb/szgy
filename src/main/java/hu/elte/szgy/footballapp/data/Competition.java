@@ -69,12 +69,14 @@ public class Competition implements Serializable {
 
     public CompetitionNameDTO getCompetitionNameDTO(){
         CompetitionNameDTO cnDTO = new CompetitionDTO();
+        cnDTO.setCompId(compId);
         cnDTO.setName(name);
         return cnDTO;
     }
 
     public CompetitionDTO getCompetitionDTO(){
         CompetitionDTO cDTO = new CompetitionDTO();
+        cDTO.setCompId(compId);
         cDTO.setName(name);
         cDTO.setTeams(teams.stream().map(Team::getTeamNameDTO).collect(Collectors.toList()));
         return cDTO;

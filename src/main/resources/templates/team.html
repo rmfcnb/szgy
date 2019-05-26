@@ -14,21 +14,162 @@
             try{
                 var team = JSON.parse(teamStr.replace(/&quot;/g,'"'));
 
+                var compStore = Ext.create('Ext.data.Store', {
+                    fields : ['name'],
+                    proxy  : {
+                        type   : 'memory',
+                        reader : {
+                            type : 'json',
+                            rootProperty : 'items'
+                        }
+                    }
+                });
+
+                var playedMatchesStore = Ext.create('Ext.data.Store', {
+                    fields : ['hteam','hgoals','agoals','ateam'],
+                    proxy  : {
+                        type   : 'memory',
+                        reader : {
+                            type : 'json',
+                            rootProperty : 'items'
+                        }
+                    }
+                });
+
+                var nextMatchesStore = Ext.create('Ext.data.Store', {
+                    fields : ['hteam','hgoals','agoals','ateam'],
+                    proxy  : {
+                        type   : 'memory',
+                        reader : {
+                            type : 'json',
+                            rootProperty : 'items'
+                        }
+                    }
+                });
+
                 var teamNameLabel = Ext.create('Ext.form.Label', {
                     text: team.name
                 });
 
+                Ext.define('MyApp.view.CompetitionPanel', {
+                    extend: 'Ext.grid.Panel',
+                    height: 315,
+                    width: 784,
+                    title: 'Competitions',
+                    store: team.competitions,
+
+                    columns: [  {
+                        text: 'Name',
+                        width: 100,
+                        sortable: false,
+                        hideable: false,
+                        dataIndex: 'name'
+                    }],
+                    plugins: [{
+                        ptype: 'cellediting',
+                        autoCancel: false,
+                        clicksToEdit: 1
+                    }],
+                    viewConfig : {
+                        listeners : {
+                            itemdblclick : function(view, cell, cellIndex, record, row, rowIndex, e) {
+                                console.log(cell);
+                                window.location.assign("/competition/byId/"+cell.data.id);
+                            }
+                        }
+                    }
+                });
+
+                var compGrid = Ext.create('MyApp.view.CompetitionPanel', {
+                    renderTo: Ext.getBody()
+                });
+
+                Ext.define('MyApp.view.PlayedMatchesPanel', {
+                    extend: 'Ext.grid.Panel',
+                    height: 500,
+                    width: 1000,
+                    title: 'Matches',
+                    store: playedMatchesStore,
+
+                    columns: [  {
+                        text: 'Home Team',
+                        width: 100,
+                        sortable: false,
+                        hideable: false,
+                        dataIndex: 'hteam'
+                    },{
+                        text: 'Home Goals',
+                        width: 100,
+                        sortable: false,
+                        hideable: false,
+                        dataIndex: 'hgoals'
+                    },{
+                        text: 'Away Goals',
+                        width: 100,
+                        sortable: false,
+                        hideable: false,
+                        dataIndex: 'agoals'
+                    },{
+                        text: 'Away Team',
+                        width: 100,
+                        sortable: false,
+                        hideable: false,
+                        dataIndex: 'ateam'
+                    }],
+                    viewConfig : {
+                        listeners : {
+                            itemdblclick : function(view, cell, cellIndex, record, row, rowIndex, e) {
+                                window.location.assign("/match/editMatch/"+cell.data.id);
+                            }
+                        }
+                    }
+                });
+
+                var playedMatchesGrid = Ext.create('MyApp.view.PlayedMatchesPanel', {
+                    renderTo: Ext.getBody(),
+                    title: 'Played Matches',
+                    store: playedMatchesStore
+                });
+
+                var nextMatchesGrid = Ext.create('MyApp.view.PlayedMatchesPanel', {
+                    renderTo: Ext.getBody(),
+                    title: 'Next Matches',
+                    store: nextMatchesStore
+                });
+
+                for(var i = 0; i<team.competitions.length; i++){
+                    compStore.add({id: team.competitions[i].compId, name: team.competitions[i].name});
+                }
+
+                for(var j = 0; j<team.matches.length; j++){
+                    var record = {id: team.matches[j].matchId, hteam: team.matches[j].homeTeam.name, hgoals: team.matches[j].homeGoals,
+                        agoals: team.matches[j].awayGoals, ateam: team.matches[j].awayTeam.name};
+
+                    if(team.matches[j].wasPlayed){
+                        playedMatchesStore.add(record);
+                    }else{
+                        nextMatchesStore.add(record);
+                    }
+                }
+
                 Ext.create('Ext.panel.Panel', {
                     renderTo: Ext.getBody(),
                     width: 1000,
-                    height:500,
-                    layout: 'border',
+                    height: 1500,
+                    layout: {
+                        type: 'vbox',
+                        align: 'stretch',
+                        padding: 5
+                    },
                     items: [
-                        teamNameLabel
+                        teamNameLabel,
+                        compGrid,
+                        playedMatchesGrid,
+                        nextMatchesGrid
                     ]
                 }).center();
             } catch(e){
-                alert("Invalid team id")
+                alert("Internal error")
             }
         });
     </script>

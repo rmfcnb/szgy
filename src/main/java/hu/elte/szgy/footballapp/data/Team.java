@@ -69,12 +69,14 @@ public class Team implements Serializable {
 
     public TeamNameDTO getTeamNameDTO(){
         TeamNameDTO tnDTO = new TeamNameDTO();
+        tnDTO.setTeamId(teamId);
         tnDTO.setName(name);
         return tnDTO;
     }
 
     public TeamDTO getTeamDTO(){
         TeamDTO tDTO = new TeamDTO();
+        tDTO.setTeamId(teamId);
         tDTO.setName(name);
         tDTO.setCompetitions(competitions.stream().map(Competition::getCompetitionNameDTO).collect(Collectors.toList()));
         List<MatchDTO> matches = homeMatches.stream().map(Match::getMatchDTO).collect(Collectors.toList());
