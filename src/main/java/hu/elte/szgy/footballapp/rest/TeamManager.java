@@ -6,6 +6,9 @@ import hu.elte.szgy.footballapp.data.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.authentication.AnonymousAuthenticationToken;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.ModelAndView;
@@ -20,6 +23,12 @@ public class TeamManager {
 
     @Autowired
     private TeamRepository teamRepo;
+
+    @Autowired
+    private UserRepository userRepo;
+
+    @Autowired
+    private FavouriteRepository favRepo;
 
     @GetMapping("/all")
     public ResponseEntity<List<Team>> getAllTeams(){
@@ -69,12 +78,33 @@ public class TeamManager {
     }
 
     @PostMapping("/new")
-    public ResponseEntity<Team> createTeam(@RequestBody TeamNameDTO team){
+    public ResponseEntity<Void> createTeam(@RequestBody TeamNameDTO team){
         Team newTeam = new Team();
         newTeam.setTeamId(getNewId());
         newTeam.setName(team.getName());
-        teamRepo.saveAndFlush(newTeam);
-        return new ResponseEntity<>(newTeam, HttpStatus.OK);
+        teamRepo.save(newTeam);
+        return new ResponseEntity<>(HttpStatus.OK);
+    }
+
+    @PostMapping("/addToFavourite/{id}")
+    public ResponseEntity<Void> addToFavourite(@PathVariable("id") int teamId){
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        if (!(authentication instanceof AnonymousAuthenticationToken)) {
+            String currentUserName = authentication.getName();
+            Optional<User> currentUser = userRepo.findById(currentUserName);
+            Optional<Team> team = teamRepo.findById(teamId);
+            if(currentUser.isPresent() && team.isPresent()){
+                Optional<Favourite> fav = favRepo.findByUser(currentUser.get());
+                if(fav.isPresent()){
+                    fav.get().addTeam(team.get());
+                    favRepo.save(fav.get());
+                }
+
+                return new ResponseEntity<>(HttpStatus.OK);
+            }
+        }
+
+        return new ResponseEntity<>(HttpStatus.NOT_FOUND);
     }
 
     @GetMapping("/home")

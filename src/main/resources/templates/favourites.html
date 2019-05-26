@@ -14,19 +14,42 @@
             try{
                 var favourites = JSON.parse(favStr.replace(/&quot;/g,'"'));
                 console.log(favourites);
+
+                var compStore = Ext.create('Ext.data.Store', {
+                    fields : ['name'],
+                    proxy  : {
+                        type   : 'memory',
+                        reader : {
+                            type : 'json',
+                            rootProperty : 'items'
+                        }
+                    }
+                });
+
+                var teamStore = Ext.create('Ext.data.Store', {
+                    fields : ['name'],
+                    proxy  : {
+                        type   : 'memory',
+                        reader : {
+                            type : 'json',
+                            rootProperty : 'items'
+                        }
+                    }
+                });
+
                 Ext.define('MyApp.view.CompetitionGridPanel', {
                     extend: 'Ext.grid.Panel',
                     height: 315,
                     width: 784,
                     title: 'Competitions',
-                    store: favourites.competitions,
+                    store: compStore,
 
                     columns: [  {
                         text: 'Name',
                         width: 100,
                         sortable: false,
                         hideable: false,
-                        dataIndex: 'competition'
+                        dataIndex: 'name'
                     }],
                     plugins: [{
                         ptype: 'cellediting',
@@ -51,18 +74,14 @@
                     height: 315,
                     width: 784,
                     title: 'Teams',
-                    store: favourites.teams,
-                    layout: {
-                        type: 'vbox',
-                        padding: 5
-                    },
+                    store: teamStore,
 
                     columns: [  {
                         text: 'Name',
                         width: 100,
                         sortable: false,
                         hideable: false,
-                        dataIndex: 'team'
+                        dataIndex: 'name'
                     }],
                     plugins: [{
                         ptype: 'cellediting',
@@ -81,8 +100,44 @@
                 var teamGrid = Ext.create('MyApp.view.TeamGridPanel', {
                     renderTo: Ext.getBody()
                 });
+
+                for(var i = 0; i<favourites.competitions.length; i++){
+                    compStore.add({id: favourites.competitions[i].compId, name: favourites.competitions[i].name });
+                }
+
+                for(var j = 0; j<favourites.teams.length; j++){
+                    var r = {id: favourites.teams[j].teamId, name: favourites.teams[j].name};
+                    console.log(r);
+                    teamStore.add(r);
+                }
+
+                var homeButton = Ext.create('Ext.button.Button', {
+                    text: 'Home',
+                    handler: function () {
+                        window.location.assign("/home");
+                    }
+                });
+
+                Ext.create('Ext.panel.Panel', {
+                    renderTo: Ext.getBody(),
+                    width: 1000,
+                    height: 800,
+                    layout: {
+                        type: 'vbox',
+                        padding: 5
+                    },
+
+                    items: [
+                        compGrid,
+                        teamGrid
+                    ],
+                    buttons: [
+                        homeButton
+                    ]
+                });
             } catch(e){
-                alert("Invalid favourite")
+                alert("Invalid favourite");
+                alert(e);
             }
         });
     </script>

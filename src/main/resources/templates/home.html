@@ -149,11 +149,11 @@
             });
 
             Ext.Ajax.request({
-                url: '/user/isLogedIn',
+                url: '/user/isLoggedIn',
                 method: 'GET',
                 success: function (form, action) {
-                    var logedIn = Ext.JSON.decode(form.responseText);
-                    if(logedIn){
+                    var loggedIn = Ext.JSON.decode(form.responseText);
+                    if(loggedIn){
                         registrationButton.hide();
                         loginButton.hide();
                     }else{
@@ -162,7 +162,35 @@
                     }
                 },
                 failure: function (form, action) {
-                    alert('Failed', form.responseText);
+                    alert(form.responseText);
+                }
+            });
+
+            var newTeamButton = Ext.create('Ext.button.Button', {
+                text: 'New Team',
+                handler: function() {
+                    window.location.assign("/newTeam");
+                }
+            });
+            var newCompButton = Ext.create('Ext.button.Button', {
+                text: 'New Competition',
+                handler: function() {
+                    window.location.assign("/newCompetition");
+                }
+            });
+
+            Ext.Ajax.request({
+                url: '/user/isAdmin',
+                method: 'GET',
+                success: function (form, action) {
+                    var isAdmin = Ext.JSON.decode(form.responseText);
+                    if(!isAdmin){
+                        newTeamButton.hide();
+                        newCompButton.hide();
+                    }
+                },
+                failure: function (form, action) {
+                    alert(form.responseText);
                 }
             });
 
@@ -178,7 +206,7 @@
                     }
                 },
                 failure: function (form, action) {
-                    alert('Failed', form.responseText);
+                    alert(form.responseText);
                 }
             });
 
@@ -194,7 +222,7 @@
                     }
                 },
                 failure: function (form, action) {
-                    alert('Failed', form.responseText);
+                    alert(form.responseText);
                 }
             });
 
@@ -212,6 +240,8 @@
                     teamGrid
                 ],
                 buttons: [
+                    newTeamButton,
+                    newCompButton,
                     registrationButton,
                     loginButton,
                     favButton,

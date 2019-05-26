@@ -7,6 +7,9 @@ import org.springframework.beans.TypeMismatchException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.authentication.AnonymousAuthenticationToken;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.ModelAndView;
@@ -32,6 +35,12 @@ public class CompetitionManager {
 
     @Autowired
     private MatchRepository matchRepo;
+
+    @Autowired
+    private UserRepository userRepo;
+
+    @Autowired
+    private FavouriteRepository favRepo;
 
     @GetMapping("/all")
     public ResponseEntity<List<Competition>> getAllCompetition(@RequestParam(name = "type", required = false) String type) {
@@ -173,6 +182,27 @@ public class CompetitionManager {
         competitions.sort(Comparator.comparing(Competition::getName));
 
         return new ResponseEntity<>(competitions, HttpStatus.OK);
+    }
+
+    @PostMapping("/addToFavourite/{id}")
+    public ResponseEntity<Void> addToFavourite(@PathVariable("id") int compId){
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        if (!(authentication instanceof AnonymousAuthenticationToken)) {
+            String currentUserName = authentication.getName();
+            Optional<User> currentUser = userRepo.findById(currentUserName);
+            Optional<Competition> comp = compRepo.findById(compId);
+            if(currentUser.isPresent() && comp.isPresent()){
+                Optional<Favourite> fav = favRepo.findByUser(currentUser.get());
+                if(fav.isPresent()){
+                    fav.get().addCompetition(comp.get());
+                    favRepo.save(fav.get());
+                }
+
+                return new ResponseEntity<>(HttpStatus.OK);
+            }
+        }
+
+        return new ResponseEntity<>(HttpStatus.NOT_FOUND);
     }
 
     @GetMapping("/generateCompetitions")

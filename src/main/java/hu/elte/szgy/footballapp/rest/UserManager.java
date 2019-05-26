@@ -64,10 +64,25 @@ public class UserManager {
         return new ResponseEntity<>(HttpStatus.OK);
     }
 
-    @GetMapping("/isLogedIn")
-    public ResponseEntity<Boolean> isLogedIn(){
+    @GetMapping("/isLoggedIn")
+    public ResponseEntity<Boolean> isLoggedIn(){
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         return new ResponseEntity<>(!(authentication instanceof AnonymousAuthenticationToken),HttpStatus.OK);
+    }
+
+    @GetMapping("/isAdmin")
+    public ResponseEntity<Boolean> isAdmin(){
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        boolean isAdmin = false;
+        if (!(authentication instanceof AnonymousAuthenticationToken)) {
+            String currentUserName = authentication.getName();
+            Optional<User> currentUser = userRepo.findById(currentUserName);
+
+            if(currentUser.isPresent()){
+                isAdmin = currentUser.get().getType() == User.UserType.ADMIN;
+            }
+        }
+        return new ResponseEntity<>(isAdmin, HttpStatus.OK);
     }
 
     @GetMapping("/logout")

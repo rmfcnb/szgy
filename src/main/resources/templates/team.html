@@ -53,10 +53,10 @@
 
                 Ext.define('MyApp.view.CompetitionPanel', {
                     extend: 'Ext.grid.Panel',
-                    height: 315,
+                    height: 300,
                     width: 784,
                     title: 'Competitions',
-                    store: team.competitions,
+                    store: compStore,
 
                     columns: [  {
                         text: 'Name',
@@ -86,7 +86,7 @@
 
                 Ext.define('MyApp.view.PlayedMatchesPanel', {
                     extend: 'Ext.grid.Panel',
-                    height: 500,
+                    height: 300,
                     width: 1000,
                     title: 'Matches',
                     store: playedMatchesStore,
@@ -126,13 +126,11 @@
                 });
 
                 var playedMatchesGrid = Ext.create('MyApp.view.PlayedMatchesPanel', {
-                    renderTo: Ext.getBody(),
                     title: 'Played Matches',
                     store: playedMatchesStore
                 });
 
                 var nextMatchesGrid = Ext.create('MyApp.view.PlayedMatchesPanel', {
-                    renderTo: Ext.getBody(),
                     title: 'Next Matches',
                     store: nextMatchesStore
                 });
@@ -152,10 +150,46 @@
                     }
                 }
 
+                var homeButton = Ext.create('Ext.button.Button', {
+                    text: 'Home',
+                    handler: function () {
+                        window.location.assign("/home");
+                    }
+                });
+
+                var favButton = Ext.create('Ext.button.Button', {
+                    text: 'Add to Favourites',
+                    handler: function () {
+                        Ext.Ajax.request({
+                            url: '/team/addToFavourite/' + team.teamId,
+                            method: 'POST',
+                                success: function (form, action) {
+                            },
+                            failure: function (form, action) {
+                                alert(form.responseText);
+                            }
+                        });
+                    }
+                });
+
+                Ext.Ajax.request({
+                    url: '/user/isLoggedIn',
+                    method: 'GET',
+                    success: function (form, action) {
+                        var loggedIn = Ext.JSON.decode(form.responseText);
+                        if(!loggedIn){
+                            favButton.hide();
+                        }
+                    },
+                    failure: function (form, action) {
+                        alert(form.responseText);
+                    }
+                });
+
                 Ext.create('Ext.panel.Panel', {
                     renderTo: Ext.getBody(),
                     width: 1000,
-                    height: 1500,
+                    height: 1000,
                     layout: {
                         type: 'vbox',
                         padding: 5
@@ -165,8 +199,12 @@
                         compGrid,
                         playedMatchesGrid,
                         nextMatchesGrid
+                    ],
+                    buttons: [
+                        favButton,
+                        homeButton
                     ]
-                }).center();
+                });
             } catch(e){
                 alert("Internal error")
             }

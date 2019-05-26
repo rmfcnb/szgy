@@ -15,8 +15,8 @@
                 region: 'center',
                 title: 'New team',
                 standardSubmit:true,
-                width: 350,
-                height: 350,
+                width: 300,
+                height: 200,
                 autoHeight: true,
                 layout: {
                     type: 'vbox'
@@ -35,10 +35,10 @@
                             method: 'POST',
                             jsonData: form.getValues(),
                             success: function (form, action) {
-                                Ext.Msg.alert('Success', action.result.msg);
+                                window.location.assign("/home");
                             },
                             failure: function (form, action) {
-                                Ext.Msg.alert('Failed', action.result.msg);
+                                alert(form.responseText);
                             }
                         })
                     }

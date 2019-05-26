@@ -18,7 +18,7 @@ public class Favourite implements Serializable {
     @Column(name = "ID")
     private int favId;
 
-    @OneToOne(mappedBy = "favourite", cascade = CascadeType.ALL, fetch = FetchType.LAZY, optional = false)
+    @OneToOne(mappedBy = "favourite", cascade = CascadeType.ALL, fetch = FetchType.EAGER, optional = false)
     private User user;
 
     @OneToMany(cascade = CascadeType.ALL, orphanRemoval = true)
@@ -59,6 +59,14 @@ public class Favourite implements Serializable {
 
     public void setTeams(Set<Team> teams) {
         this.teams = teams;
+    }
+
+    public void addCompetition(Competition comp){
+        competitions.add(comp);
+    }
+
+    public void addTeam(Team team){
+        teams.add(team);
     }
 
     public FavouriteDTO getFavouriteDTO(){
