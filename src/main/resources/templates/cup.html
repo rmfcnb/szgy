@@ -1,0 +1,116 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:th="http://www.thymeleaf.org"
+      xmlns:sec="http://www.thymeleaf.org/thymeleaf-extras-springsecurity3">
+<head>
+    <meta charset="UTF-8">
+    <title>Competition</title>
+    <link rel="stylesheet" type="text/css" href="https://cdnjs.cloudflare.com/ajax/libs/extjs/6.2.0/classic/theme-neptune/resources/theme-neptune-all.css">
+    <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/extjs/6.2.0/ext-all-debug.js"></script>
+    <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/extjs/6.2.0/classic/theme-neptune/theme-neptune.js"></script>
+    <script type="text/javascript">
+        var cupStr = "[[${competition}]]";
+        Ext.onReady(function(){
+            try{
+                var cup = JSON.parse(cupStr.replace(/&quot;/g,'"'));
+
+                var store = Ext.create('Ext.data.Store', {
+                    fields : ['name','matches','wins','draws','loses','goals','goalsAgainst','goalDif', 'points'],
+                    proxy  : {
+                        type   : 'memory',
+                        reader : {
+                            type : 'json',
+                            rootProperty : 'items'
+                        }
+                    }
+                });
+
+                var matchStore = Ext.create('Ext.data.Store', {
+                    fields : ['hteam','hgoals','agoals','ateam'],
+                    proxy  : {
+                        type   : 'memory',
+                        reader : {
+                            type : 'json',
+                            rootProperty : 'items'
+                        }
+                    }
+                });
+
+                var compNameLabel = Ext.create('Ext.form.Label', {
+                    text: cup.name
+                });
+
+                Ext.define('MyApp.view.MatchPanel', {
+                    extend: 'Ext.grid.Panel',
+                    height: 500,
+                    width: 1000,
+                    title: 'Matches',
+                    store: matchStore,
+
+                    columns: [  {
+                        text: 'Home Team',
+                        width: 100,
+                        sortable: false,
+                        hideable: false,
+                        dataIndex: 'hteam'
+                    },{
+                        text: 'Home Goals',
+                        width: 100,
+                        sortable: false,
+                        hideable: false,
+                        dataIndex: 'hgoals'
+                    },{
+                        text: 'Away Goals',
+                        width: 100,
+                        sortable: false,
+                        hideable: false,
+                        dataIndex: 'agoals'
+                    },{
+                        text: 'Away Team',
+                        width: 100,
+                        sortable: false,
+                        hideable: false,
+                        dataIndex: 'ateam'
+                    }],
+                    viewConfig : {
+                        listeners : {
+                            itemdblclick : function(view, cell, cellIndex, record, row, rowIndex, e) {
+                                window.location.assign("/match/editMatch/"+cell.data.id);
+                            }
+                        }
+                    }
+                });
+
+                var matchGrid = Ext.create('MyApp.view.MatchPanel', {
+                    renderTo: Ext.getBody()
+                });
+
+                for(var j = 0; j<cup.matches.length; j++){
+                    matchStore.add({id: cup.matches[j].matchId, hteam: cup.matches[j].homeTeam.name, hgoals: cup.matches[j].homeGoals,
+                        agoals: cup.matches[j].awayGoals, ateam: cup.matches[j].awayTeam.name});
+                }
+
+                Ext.create('Ext.panel.Panel', {
+                    renderTo: Ext.getBody(),
+                    width: 1000,
+                    height: 800,
+                    layout: {
+                        type: 'vbox',
+                        padding: 5
+                    },
+
+                    items: [
+                        compNameLabel,
+                        matchGrid
+                    ]
+                });
+            } catch(e){
+                alert("Invalid team id")
+            }
+        });
+    </script>
+</head>
+<body>
+    <div id="maindiv" style="height: 500px"/>
+</body>
+</html>

@@ -100,12 +100,14 @@ public class Team implements Serializable {
         int drawNum = (int)hMatches.stream().filter(match -> match.getWasPlayed() && match.isDraw()).count()+
                 (int)aMatches.stream().filter(match -> match.getWasPlayed() && match.isDraw()).count();
 
+        int loseNum = (int)hMatches.stream().filter(match -> match.getWasPlayed() && match.isAwayWin()).count()+
+                (int)aMatches.stream().filter(match -> match.getWasPlayed() && match.isHomeWin()).count();
+
         ctrDTO.setWins(winNum);
         ctrDTO.setDraws(drawNum);
-        ctrDTO.setLoses((int)hMatches.stream().filter(match -> match.getWasPlayed() && match.isAwayWin()).count()+
-                (int)aMatches.stream().filter(match -> match.getWasPlayed() && match.isHomeWin()).count());
+        ctrDTO.setLoses(loseNum);
 
-        ctrDTO.setMatches(hMatches.size() + aMatches.size());
+        ctrDTO.setMatches(winNum + drawNum + loseNum);
 
         int goals = hMatches.stream().map(Match::getHomeGoals).reduce(0, Integer::sum)+
                 aMatches.stream().map(Match::getAwayGoals).reduce(0, Integer::sum);

@@ -9,12 +9,10 @@
     <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/extjs/6.2.0/ext-all-debug.js"></script>
     <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/extjs/6.2.0/classic/theme-neptune/theme-neptune.js"></script>
     <script type="text/javascript">
-        var competitionStr = "[[${competition}]]";
+        var leagueStr = "[[${competition}]]";
         Ext.onReady(function(){
             try{
-                var competition = JSON.parse(competitionStr.replace(/&quot;/g,'"'));
-
-                console.log(competition);
+                var league = JSON.parse(leagueStr.replace(/&quot;/g,'"'));
 
                 var store = Ext.create('Ext.data.Store', {
                     fields : ['name','matches','wins','draws','loses','goals','goalsAgainst','goalDif', 'points'],
@@ -39,7 +37,7 @@
                 });
 
                 var compNameLabel = Ext.create('Ext.form.Label', {
-                    text: competition.name
+                    text: league.name
                 });
 
                 Ext.define('MyApp.view.CompetitionPanel', {
@@ -167,16 +165,16 @@
                     renderTo: Ext.getBody()
                 });
 
-                for(var i = 0; i<competition.content.length; i++){
-                    store.add({ id: competition.content[i].teamId, name: competition.content[i].name, matches: competition.content[i].matches,
-                        wins: competition.content[i].wins, draws: competition.content[i].draws, loses: competition.content[i].loses,
-                        goals: competition.content[i].goals, goalsAgainst: competition.content[i].goalsAgainst, goalDif: competition.content[i].goalDif,
-                        points: competition.content[i].points });
+                for(var i = 0; i<league.content.length; i++){
+                    store.add({ id: league.content[i].teamId, name: league.content[i].name, matches: league.content[i].matches,
+                        wins: league.content[i].wins, draws: league.content[i].draws, loses: league.content[i].loses,
+                        goals: league.content[i].goals, goalsAgainst: league.content[i].goalsAgainst, goalDif: league.content[i].goalDif,
+                        points: league.content[i].points });
                 }
 
-                for(var j = 0; j<competition.matches.length; j++){
-                    matchStore.add({id: competition.matches[j].matchId, hteam: competition.matches[j].homeTeam.name, hgoals: competition.matches[j].homeGoals,
-                        agoals: competition.matches[j].awayGoals, ateam: competition.matches[j].awayTeam.name});
+                for(var j = 0; j<league.matches.length; j++){
+                    matchStore.add({id: league.matches[j].matchId, hteam: league.matches[j].homeTeam.name, hgoals: league.matches[j].homeGoals,
+                        agoals: league.matches[j].awayGoals, ateam: league.matches[j].awayTeam.name});
                 }
 
                 Ext.create('Ext.panel.Panel', {
@@ -185,7 +183,6 @@
                     height: 800,
                     layout: {
                         type: 'vbox',
-                        align: 'stretch',
                         padding: 5
                     },
 

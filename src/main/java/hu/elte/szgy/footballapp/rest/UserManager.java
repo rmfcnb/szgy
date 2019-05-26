@@ -64,6 +64,18 @@ public class UserManager {
         return new ResponseEntity<>(HttpStatus.OK);
     }
 
+    @GetMapping("/isLogedIn")
+    public ResponseEntity<Boolean> isLogedIn(){
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        return new ResponseEntity<>(!(authentication instanceof AnonymousAuthenticationToken),HttpStatus.OK);
+    }
+
+    @GetMapping("/logout")
+    public ResponseEntity<Void> logout(){
+        SecurityContextHolder.clearContext();
+        return new ResponseEntity<>(HttpStatus.OK);
+    }
+
     private int getNewFavouriteId(){
         Optional<Favourite> maxIdFav = favRepo.findAll().stream().max(Comparator.comparingInt(Favourite::getFavId));
         return maxIdFav.map(favourite -> favourite.getFavId() + 1).orElse(0);

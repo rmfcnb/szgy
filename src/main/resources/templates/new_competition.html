@@ -62,7 +62,7 @@
                     border: 1
                 },
                 handler: function() {
-                    addRow()
+                    addRow();
                 }
             });
 
@@ -72,7 +72,7 @@
                     border: 1
                 },
                 handler: function() {
-                    removeRow()
+                    removeRow();
                 }
             });
 
@@ -87,7 +87,7 @@
                         method: 'POST',
                         jsonData: getCompetition(),
                         success: function (form, action) {
-                            alert("Success");
+                            window.location.assign("/home");
                         },
                         failure: function (form, action) {
                             alert(form.responseText);
@@ -103,7 +103,8 @@
                 }
                 return {
                     competitionName : nameField.getValue(),
-                    teamNames: teams
+                    teamNames: teams,
+                    type: compType.getValue()
                 }
             };
 
@@ -113,16 +114,44 @@
                 allowBlank: false
             });
 
+            var typeStore = Ext.create('Ext.data.Store', {
+                fields: ['type'],
+                data : [
+                    {"type":"League"},
+                    {"type":"Cup"}
+                ]
+            });
+
+            var compType = Ext.create('Ext.form.ComboBox', {
+                fieldLabel: 'Type',
+                valueField: 'type',
+                store: typeStore,
+                tpl: Ext.create('Ext.XTemplate',
+                    '<ul class="x-list-plain"><tpl for=".">',
+                    '<li role="option" class="x-boundlist-item">{type}</li>',
+                    '</tpl></ul>'
+                ),
+                displayTpl: Ext.create('Ext.XTemplate',
+                    '<tpl for=".">',
+                    '{type}',
+                    '</tpl>'
+                )
+            });
+
+            compType.setValue("League");
+
             Ext.create('Ext.panel.Panel', {
                 renderTo: Ext.getBody(),
                 width: 1000,
                 height:500,
-                layout: 'border',
+                layout: {
+                    type: 'vbox',
+                    padding: 5
+                },
                 items: [
                     nameField,
-                    { region:'west', width: 100 },
-                    grid,
-                    { region:'east', width: 140}
+                    compType,
+                    grid
                 ],
                 buttons: [
                     addButton,

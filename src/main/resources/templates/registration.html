@@ -35,7 +35,7 @@
                             password: pswText.getValue()
                         },
                         success: function (form, action) {
-                            alert("User " + usernameText.getValue() + " crated!");
+                            window.location.assign("/home");
                         },
                         failure: function (form, action) {
                             alert(form.responseText);
@@ -48,7 +48,10 @@
                 renderTo: Ext.getBody(),
                 width: 1000,
                 height:500,
-                layout: 'border',
+                layout: {
+                    type: 'vbox',
+                    padding: 5
+                },
                 items: [
                     usernameText,
                     pswText

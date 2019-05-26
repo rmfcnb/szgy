@@ -11,7 +11,7 @@
         Ext.onReady(function () {
             var loginpanel = Ext.create('Ext.form.Panel', {
                 region: 'center',
-                title: 'Bejelentkező panel',
+                title: 'Login',
                 standardSubmit:true,
                 width: 350,
                 height: 350,
@@ -34,7 +34,7 @@
                             var form = this.up('form').getForm();
                             form.submit({
                                 success: function(form, action) {
-                                    alert('Success', action.result.msg);
+                                    window.location.assign("/home");
                                 },
                                 failure: function(form, action) {
                                     console.log(form.responseText);

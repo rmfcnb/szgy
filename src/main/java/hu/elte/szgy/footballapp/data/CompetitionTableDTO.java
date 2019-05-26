@@ -23,7 +23,7 @@ public class CompetitionTableDTO {
 
     public void setContent(List<CompetitionTableRecordDTO> content) {
         this.content = content;
-        this.content.sort(Comparator.comparingInt(CompetitionTableRecordDTO::getPoints));
+        this.content.sort(Comparator.comparingInt(CompetitionTableRecordDTO::getPoints).thenComparingInt(CompetitionTableRecordDTO::getGoalDif).reversed());
     }
 
     public List<MatchDTO> getMatches() {

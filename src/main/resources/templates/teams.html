@@ -74,7 +74,10 @@
                 renderTo: Ext.getBody(),
                 width: 1000,
                 height:500,
-                layout: 'border',
+                layout: {
+                    type: 'vbox',
+                    padding: 5
+                },
                 items: [
                     label,
                     searchField,

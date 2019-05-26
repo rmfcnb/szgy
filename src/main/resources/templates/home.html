@@ -101,6 +101,71 @@
                 renderTo: Ext.getBody()
             });
 
+            var gotoTeamSearchButton = Ext.create('Ext.button.Button', {
+                text: 'Teams',
+                handler: function() {
+                    window.location.assign("/teams");
+                }
+            });
+            var gotoCompetitionSearchButton = Ext.create('Ext.button.Button', {
+                text: 'Competitions',
+                handler: function() {
+                    window.location.assign("/competitions");
+                }
+            });
+
+            var logoutButton = Ext.create('Ext.button.Button', {
+                text: 'Logout',
+                handler: function() {
+                    Ext.Ajax.request({
+                        url: '/user/logout',
+                        method: 'GET',
+                        success: function (form, action) {
+                            window.location.reload();
+                        },
+                        failure: function (form, action) {
+                            alert('Failed', form.responseText);
+                        }
+                    });
+                }
+            });
+            var favButton = Ext.create('Ext.button.Button', {
+                text: 'Favourites',
+                handler: function() {
+                    window.location.assign("/favourites/all");
+                }
+            });
+            var registrationButton = Ext.create('Ext.button.Button', {
+                text: 'Register',
+                handler: function() {
+                    window.location.assign("/registration");
+                }
+            });
+            var loginButton = Ext.create('Ext.button.Button', {
+                text: 'Login',
+                handler: function() {
+                    window.location.assign("/login");
+                }
+            });
+
+            Ext.Ajax.request({
+                url: '/user/isLogedIn',
+                method: 'GET',
+                success: function (form, action) {
+                    var logedIn = Ext.JSON.decode(form.responseText);
+                    if(logedIn){
+                        registrationButton.hide();
+                        loginButton.hide();
+                    }else{
+                        logoutButton.hide();
+                        favButton.hide();
+                    }
+                },
+                failure: function (form, action) {
+                    alert('Failed', form.responseText);
+                }
+            });
+
             Ext.Ajax.request({
                 url: '/competition/home',
                 method: 'GET',
@@ -131,6 +196,29 @@
                 failure: function (form, action) {
                     alert('Failed', form.responseText);
                 }
+            });
+
+            Ext.create('Ext.panel.Panel', {
+                renderTo: Ext.getBody(),
+                width: 1000,
+                height: 800,
+                layout: {
+                    type: 'vbox',
+                    padding: 5
+                },
+
+                items: [
+                    compGrid,
+                    teamGrid
+                ],
+                buttons: [
+                    registrationButton,
+                    loginButton,
+                    favButton,
+                    logoutButton,
+                    gotoTeamSearchButton,
+                    gotoCompetitionSearchButton
+                ]
             });
         });
     </script>

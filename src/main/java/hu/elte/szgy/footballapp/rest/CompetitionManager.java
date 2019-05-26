@@ -96,10 +96,18 @@ public class CompetitionManager {
             teams.add(team.get());
         }
 
-        Competition newComp = new Competition();
+        Competition newComp;
+        if(comp.getType().toLowerCase().equals("league")){
+            newComp = new League();
+        }else if(comp.getType().toLowerCase().equals("cup")){
+            newComp = new Cup();
+        }else{
+            return new ResponseEntity<>("Unknown competition type: " + comp.getType(), HttpStatus.BAD_REQUEST);
+        }
         newComp.setCompId(getNewCompetitionId());
         newComp.setName(comp.getCompetitionName());
         newComp.setTeams(teams);
+        newComp.setMatches(generateMatches(newComp, new LinkedList<>(teams)));
 
         compRepo.save(newComp);
 
@@ -108,17 +116,28 @@ public class CompetitionManager {
 
     @ExceptionHandler(TypeMismatchException.class)
     public ModelAndView handleTypeMismatchExceptionInGetCompetition(TypeMismatchException ex){
-        ModelAndView mv = new ModelAndView("competition");
+        ModelAndView mv = new ModelAndView("league");
         mv.setStatus(HttpStatus.NOT_FOUND);
         return mv;
     }
 
     @GetMapping("/byId/{id}")
     public ModelAndView getCompetitionById(@PathVariable("id") int compId){
-        ModelAndView mv = new ModelAndView("competition");
+        ModelAndView mv;
         Optional<Competition> comp = compRepo.findById(compId);
 
         if(comp.isPresent()){
+            if(comp.get().getType().equals("LEAGUE")){
+                mv = new ModelAndView("league");
+            }
+            else if(comp.get().getType().equals("CUP")){
+                mv = new ModelAndView("cup");
+            }
+            else{
+                mv = new ModelAndView();
+                mv.setStatus(HttpStatus.NOT_FOUND);
+                return mv;
+            }
             CompetitionTableDTO compDTO = new CompetitionTableDTO();
             compDTO.setName(comp.get().getName());
             compDTO.setContent(comp.get().getTeams().stream().map(team -> team.getCompetitionTableRecordDTO(compId)).collect(Collectors.toList()));
@@ -132,6 +151,7 @@ public class CompetitionManager {
             }
         }
         else{
+            mv = new ModelAndView();
             mv.setStatus(HttpStatus.NOT_FOUND);
         }
 
@@ -181,7 +201,7 @@ public class CompetitionManager {
                     teams.get(j).setCompetitions(teamComps);
                 }
                 comps.get(i).setTeams(compTeams);
-                Set<Match> matches = generateMatches(comps.get(i), new LinkedList<>(compTeams), matchIdx);
+                Set<Match> matches = generateMatchesForLeague(comps.get(i), new LinkedList<>(compTeams), matchIdx);
                 comps.get(i).setMatches(matches);
                 matchIdx = matches.stream().max(Comparator.comparingInt(Match::getMatchId)).get().getMatchId()+1;
             }
@@ -197,7 +217,33 @@ public class CompetitionManager {
         return new ResponseEntity<>(HttpStatus.OK);
     }
 
-    private Set<Match> generateMatches(Competition comp, List<Team> teams, int firstIdx){
+    private ResponseEntity<Competition> getCompetition(Integer id){
+        Competition comp = compRepo.findById(id).get();
+        return new ResponseEntity<>(comp, HttpStatus.OK);
+    }
+
+    private int getNewCompetitionId(){
+        Optional<Competition> maxIdComp = compRepo.findAll().stream().max(Comparator.comparingInt(Competition::getCompId));
+        return maxIdComp.map(comp -> comp.getCompId() + 1).orElse(0);
+    }
+
+    private int getNewMatchId(){
+        Optional<Match> maxIdComp = matchRepo.findAll().stream().max(Comparator.comparingInt(Match::getMatchId));
+        return maxIdComp.map(match -> match.getMatchId() + 1).orElse(0);
+    }
+
+    private Set<Match> generateMatches(Competition comp, List<Team> teams){
+        Set<Match> matches = new HashSet<>();
+        int currId = getNewMatchId();
+        if(comp.getType().equals("LEAGUE")){
+            matches = generateMatchesForLeague(comp, teams, currId);
+        }else if(comp.getType().equals("CUP")){
+            matches = generateMatchesForCup(comp, teams);
+        }
+        return matches;
+    }
+
+    private Set<Match> generateMatchesForLeague(Competition comp, List<Team> teams, int firstIdx){
         Set<Match> matches = new HashSet<>();
         int currId = firstIdx;
         for(int i=0; i<teams.size()-1; ++i){
@@ -215,18 +261,19 @@ public class CompetitionManager {
         return matches;
     }
 
-    private ResponseEntity<Competition> getCompetition(Integer id){
-        Competition comp = compRepo.findById(id).get();
-        return new ResponseEntity<>(comp, HttpStatus.OK);
-    }
+    private Set<Match> generateMatchesForCup(Competition comp, List<Team> teams){
+        Set<Match> matches = new HashSet<>();
+        int currId = getNewMatchId();
+        for(int i = 0; i<teams.size(); i = i+2){
+            Match match = new Match();
+            match.setMatchId(currId);
+            ++currId;
+            match.setCompetition(comp);
+            match.setHomeTeam(teams.get(i));
+            match.setAwayTeam(teams.get(i+1));
+            matches.add(match);
+        }
 
-    private int getNewCompetitionId(){
-        Optional<Competition> maxIdComp = compRepo.findAll().stream().max(Comparator.comparingInt(Competition::getCompId));
-        return maxIdComp.map(comp -> comp.getCompId() + 1).orElse(0);
-    }
-
-    private int getNewMatchId(){
-        Optional<Match> maxIdComp = matchRepo.findAll().stream().max(Comparator.comparingInt(Match::getMatchId));
-        return maxIdComp.map(match -> match.getMatchId() + 1).orElse(0);
+        return matches;
     }
 }
