@@ -55,13 +55,7 @@ public class TeamManager {
         Optional<Team> team = teamRepo.findById(teamId);
 
         if(team.isPresent()){
-            TeamDTO teamDTO = team.get().getTeamDTO();//new TeamDTO();
-            /*teamDTO.setName(team.get().getName());
-            List<MatchDTO> matches = team.get().getAwayMatches().stream().map(Match::getMatchDTO).collect(Collectors.toList());
-            matches.addAll(team.get().getHomeMatches().stream().map(Match::getMatchDTO).collect(Collectors.toList()));
-            teamDTO.setMatches(matches);
-            List<CompetitionNameDTO> competitions = team.get().getCompetitions().stream().map(Competition::getCompetitionNameDTO).collect(Collectors.toList());
-            teamDTO.setCompetitions(competitions);*/
+            TeamDTO teamDTO = team.get().getTeamDTO();
             try {
                 String teamJson = (new ObjectMapper()).writeValueAsString(teamDTO);
                 mv.addObject("team", teamJson);
