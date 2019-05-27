@@ -14,8 +14,8 @@
             try{
                 var cup = JSON.parse(cupStr.replace(/&quot;/g,'"'));
 
-                var store = Ext.create('Ext.data.Store', {
-                    fields : ['name','matches','wins','draws','loses','goals','goalsAgainst','goalDif', 'points'],
+                var teamStore = Ext.create('Ext.data.Store', {
+                    fields : ['name'],
                     proxy  : {
                         type   : 'memory',
                         reader : {
@@ -38,6 +38,33 @@
 
                 var compNameLabel = Ext.create('Ext.form.Label', {
                     text: cup.name
+                });
+
+                Ext.define('MyApp.view.TeamPanel', {
+                    extend: 'Ext.grid.Panel',
+                    height: 500,
+                    width: 1000,
+                    title: 'Teams',
+                    store: teamStore,
+
+                    columns: [  {
+                        text: 'Team',
+                        width: 100,
+                        sortable: false,
+                        hideable: false,
+                        dataIndex: 'name'
+                    }],
+                    viewConfig : {
+                        listeners : {
+                            itemdblclick : function(view, cell, cellIndex, record, row, rowIndex, e) {
+                                window.location.assign("/team/byId/"+cell.data.id);
+                            }
+                        }
+                    }
+                });
+
+                var teamGrid = Ext.create('MyApp.view.TeamPanel', {
+                    renderTo: Ext.getBody()
                 });
 
                 Ext.define('MyApp.view.MatchPanel', {
@@ -84,6 +111,10 @@
                 var matchGrid = Ext.create('MyApp.view.MatchPanel', {
                     renderTo: Ext.getBody()
                 });
+
+                for(var i = 0; i<cup.content.length; i++){
+                    teamStore.add({id: cup.content[i].teamId, name: cup.content[i].name});
+                }
 
                 for(var j = 0; j<cup.matches.length; j++){
                     matchStore.add({id: cup.matches[j].matchId, hteam: cup.matches[j].homeTeam.name, hgoals: cup.matches[j].homeGoals,
@@ -137,6 +168,7 @@
 
                     items: [
                         compNameLabel,
+                        teamGrid,
                         matchGrid
                     ],
                     buttons: [

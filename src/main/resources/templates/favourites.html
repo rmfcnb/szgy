@@ -13,7 +13,6 @@
         Ext.onReady(function(){
             try{
                 var favourites = JSON.parse(favStr.replace(/&quot;/g,'"'));
-                console.log(favourites);
 
                 var compStore = Ext.create('Ext.data.Store', {
                     fields : ['name'],
@@ -107,7 +106,6 @@
 
                 for(var j = 0; j<favourites.teams.length; j++){
                     var r = {id: favourites.teams[j].teamId, name: favourites.teams[j].name};
-                    console.log(r);
                     teamStore.add(r);
                 }
 

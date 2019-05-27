@@ -200,7 +200,6 @@
                 success: function (form, action) {
                     var competitions = Ext.JSON.decode(form.responseText);
                     compStore.removeAll();
-                    console.log(competitions);
                     for(var i = 0; i<competitions.length; i++){
                         compStore.add({id: competitions[i].compId, name : competitions[i].name, type: competitions[i].type});
                     }
@@ -216,7 +215,6 @@
                 success: function (form, action) {
                     var teams = Ext.JSON.decode(form.responseText);
                     teamStore.removeAll();
-                    console.log(teams);
                     for(var i = 0; i<teams.length; i++){
                         teamStore.add({id: teams[i].teamId, name : teams[i].name});
                     }

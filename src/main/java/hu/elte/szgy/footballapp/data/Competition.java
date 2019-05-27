@@ -68,7 +68,7 @@ public class Competition implements Serializable {
     }
 
     public CompetitionNameDTO getCompetitionNameDTO(){
-        CompetitionNameDTO cnDTO = new CompetitionDTO();
+        CompetitionNameDTO cnDTO = new CompetitionNameDTO();
         cnDTO.setCompId(compId);
         cnDTO.setName(name);
         return cnDTO;

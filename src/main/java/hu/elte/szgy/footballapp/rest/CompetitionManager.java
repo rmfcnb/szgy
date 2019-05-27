@@ -148,6 +148,7 @@ public class CompetitionManager {
                 return mv;
             }
             CompetitionTableDTO compDTO = new CompetitionTableDTO();
+            compDTO.setCompId(compId);
             compDTO.setName(comp.get().getName());
             compDTO.setContent(comp.get().getTeams().stream().map(team -> team.getCompetitionTableRecordDTO(compId)).collect(Collectors.toList()));
             compDTO.setMatches(matchRepo.findAll().stream().filter(match -> match.getCompetition().getCompId() == compId).map(Match::getMatchDTO).collect(Collectors.toList()));
